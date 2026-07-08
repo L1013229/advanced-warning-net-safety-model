@@ -1,0 +1,6 @@
+# Overlay: v0.1 legacy occupant curve (provenance unverifiable) — kept ONLY to
+# quantify how much the occupant-curve replacement changes results.
+meta:
+  tag: sev_legacy_occupant
+severity:
+  occupant_curve: kahane_mais3plus

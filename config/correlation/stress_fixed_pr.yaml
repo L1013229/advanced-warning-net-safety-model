@@ -1,0 +1,10 @@
+# Overlay: stress correlation structure for cases where p_R is FIXED (optimistic
+# response). Identical to stress.yaml minus the p_R pair, which is undefined
+# when p_R is a constant.
+meta:
+  tag: corr_stress
+correlation:
+  pairs:
+    - [mu_v_kmh, r_E_per_veh_km, 0.5]
+    - [mu_v_kmh, sigma_v_kmh, 0.3]
+    - [v_walk_m_s, t_handle_s, -0.3]

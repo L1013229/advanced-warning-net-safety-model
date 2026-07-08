@@ -1,0 +1,7 @@
+# Overlay: faster deployment (reduced d_aw, brisker walk, shorter handling)
+meta:
+  tag: baseline_fastDeploy
+distributions:
+  d_aw_m:     {dist: triangular, min: 20, mode: 30, max: 40}
+  v_walk_m_s: {dist: triangular, min: 1.2, mode: 1.5, max: 2.0}
+  t_handle_s: {dist: triangular, min: 5, mode: 10, max: 15}

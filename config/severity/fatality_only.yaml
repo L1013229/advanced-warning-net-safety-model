@@ -1,0 +1,8 @@
+# Overlay: fatality-only harm definition (supervisor comment #41).
+# Worker: Rosén et al. (AAP 2010) fatality curve, z = -7.5 + 0.096*V_kmh.
+# Occupant: Wang (2022) Table 4-1 fatality curve, z = -8.9819 + 0.1603*dV_mph.
+meta:
+  tag: sev_fatality_only
+severity:
+  worker_curve: rosen_fatality
+  occupant_curve: wang_fatality_all

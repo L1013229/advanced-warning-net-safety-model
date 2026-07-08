@@ -1,0 +1,5 @@
+# Overlay: optimistic driver response (stress test)
+meta:
+  tag: highPR
+distributions:
+  p_R: {dist: fixed, value: 0.6}

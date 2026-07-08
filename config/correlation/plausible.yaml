@@ -1,0 +1,7 @@
+# Overlay: plausible positive rank correlation between site operating speed and
+# encroachment propensity (faster sites see more departures).
+meta:
+  tag: corr_plausible
+correlation:
+  pairs:
+    - [mu_v_kmh, r_E_per_veh_km, 0.3]
