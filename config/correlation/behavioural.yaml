@@ -1,0 +1,9 @@
+# Overlay: behaviourally adverse structure — faster sites see LESS sign response
+# (speed-selection / low-credibility non-compliance concentrated among faster
+# streams). Directly probes the tail-response concern at site level.
+meta:
+  tag: corr_behavioural
+correlation:
+  pairs:
+    - [mu_v_kmh, p_R, -0.3]
+    - [mu_v_kmh, r_E_per_veh_km, 0.3]

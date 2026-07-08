@@ -1,0 +1,6 @@
+# Overlay: occupant curve for frontal crashes only (striking-vehicle occupant
+# in a front-to-rear impact). Wang (2022) DOT HS 813 219, Table 4-3.
+meta:
+  tag: sev_occupant_frontal
+severity:
+  occupant_curve: wang_mais3plus_frontal

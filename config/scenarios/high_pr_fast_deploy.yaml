@@ -1,0 +1,8 @@
+# Overlay: optimistic response + faster deployment
+meta:
+  tag: high_PR_fastDeploy
+distributions:
+  p_R:        {dist: fixed, value: 0.6}
+  d_aw_m:     {dist: triangular, min: 20, mode: 30, max: 40}
+  v_walk_m_s: {dist: triangular, min: 1.2, mode: 1.5, max: 2.0}
+  t_handle_s: {dist: triangular, min: 5, mode: 10, max: 15}

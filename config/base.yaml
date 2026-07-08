@@ -1,0 +1,71 @@
+# Base configuration — standard response, standard deployment ("baseline")
+# Semantics identical to v0.1 base.yaml; new sections: severity, correlation, output.
+meta:
+  tag: baseline
+  notes: >
+    Primary parameterisation for the manuscript (Supplementary Table S1).
+
+grid:
+  Q_veh_h: [50, 100, 200, 400, 600, 800, 1000]   # traffic flow past site (veh/h)
+  T_work_h: [0.05, 0.1, 0.25, 0.5, 1, 2, 4]      # work duration (h)
+
+monte_carlo:
+  n_iter: 20000
+  seed: 12345          # per-point seed = seed + grid index (Q-major, T-minor)
+
+model:
+  encroachment_rate_model: "constant_per_vehicle_km"
+  Q_to_ADT_multiplier: 24.0
+  allow_frequency_pathway: false
+  # Which drivers respond, holding the marginal p_R fixed:
+  # independent (legacy) | low_tail (slow drivers respond) | high_tail (fast drivers respond)
+  response_allocation: independent
+
+severity:
+  # Worker: Rosén et al. (AAP 2010, GIDAS) severe injury MAIS3+, z = -4.6 + 0.078*V_kmh
+  worker_curve: rosen_mais3plus
+  # Occupant: Wang (2022, NHTSA DOT HS 813 219, Table 4-1, all crashes) MAIS3+,
+  # z = -6.9540 + 0.1637*dV_mph. Replaces the v0.1 legacy curve whose provenance
+  # could not be verified (kahane_mais3plus is kept only for the reproduction gate).
+  occupant_curve: wang_mais3plus_all
+
+correlation:
+  # Spearman rank-correlation pairs imposed by Iman-Conover; empty = independent.
+  # Example: pairs: [[mu_v_kmh, r_E_per_veh_km, 0.3]]
+  pairs: []
+
+output:
+  trace: false
+  trace_format: parquet
+  convergence_interval: 1000
+
+distributions:
+  # TTC geometry
+  d_aw_m:            {dist: triangular, min: 30, mode: 50, max: 70}
+  # Deployment task
+  v_walk_m_s:        {dist: triangular, min: 0.9, mode: 1.3, max: 1.7}
+  t_handle_s:        {dist: triangular, min: 10, mode: 20, max: 40}
+  # Traffic state (operating speed)
+  mu_v_kmh:          {dist: normal, mean: 47.0, sd: 3.0}
+  sigma_v_kmh:       {dist: uniform, min: 6.0, max: 12.0}
+  v_cap_kmh:         {dist: fixed, value: 80.0}
+  # Sign effect
+  p_R:               {dist: uniform, min: 0.0, max: 0.30}
+  deltaV_kmh:        {dist: uniform, min: 0.0, max: 15.0}
+  a_comfort_m_s2:    {dist: uniform, min: 0.8, max: 2.5}
+  # Road departure model
+  r_E_per_veh_km:    {dist: loguniform, min: 1.0e-7, max: 1.0e-5}
+  k_rE:              {dist: loguniform, min: 0.3, max: 3.0}
+  alpha_lat_m_inv:   {dist: uniform, min: 0.02, max: 0.15}
+  # Geometry: lateral offsets
+  c_work_m:          {dist: uniform, min: 1.0, max: 3.0}
+  c_deploy_m:        {dist: uniform, min: 0.5, max: 2.0}
+  # Frequency-pathway modifier (S1) if enabled
+  k_E:               {dist: fixed, value: 1.0}
+  # Effective longitudinal exposure lengths
+  L_worker_m:        {dist: fixed, value: 10.0}
+  L_lcv_m:           {dist: fixed, value: 6.0}
+  L_worker_deploy_m: {dist: fixed, value: 1.0}
+  # Vehicle masses for delta-V mapping
+  m_striking_kg:     {dist: uniform, min: 1200.0, max: 2000.0}
+  m_lcv_kg:          {dist: uniform, min: 1800.0, max: 3000.0}
