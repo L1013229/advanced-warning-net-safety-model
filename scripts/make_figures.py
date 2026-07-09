@@ -270,42 +270,50 @@ def fig1_model_schematic():
 # fig0a -- worksite layout (NEW)
 # =========================================================================== #
 def fig0a_worksite_layout():
-    H = 9.3
+    """Plan view. New Zealand (left-hand traffic): the worksite sits on the left
+    shoulder, so the ADJACENT (near) lane runs left-to-right and passes the sign
+    before it reaches the worker. The opposing lane runs right-to-left."""
+    H = 9.15
     fig, ax = _schematic(W_CM, H)
 
     x0, x1 = 0.55, 15.95
-    road_lo, road_hi = 1.0, 2.6            # travelled way band (cm)
+    road_lo, road_hi = 0.70, 3.00          # travelled way band (cm)
+    road_mid = (road_lo + road_hi) / 2     # centreline
     sign_x = 2.5
     worker_x = 11.95                       # worker on foot
     veh_x = 13.85                          # work-vehicle centre
-    walk_y = 3.5                           # deployment walk path (c_deploy, exagg.)
-    worker_y = 5.0                         # worker + vehicle (c_work, exagg.)
-    daw_y = 7.0                            # d_AW dimension line
+    walk_y = 4.30                          # deployment walk path (c_deploy, exagg.)
+    worker_y = 6.25                        # worker + vehicle (c_work, exagg.)
+    daw_y = 8.15                           # d_AW dimension line
 
     # road surface + markings
     ax.add_patch(Rectangle((x0, road_lo), x1 - x0, road_hi - road_lo,
                            fc="#e9ecee", ec="none", zorder=0))
     ax.plot([x0, x1], [road_hi, road_hi], color="#2b2b2b", lw=1.8, zorder=2)   # edgeline
     ax.plot([x0, x1], [road_lo, road_lo], color="#7d868c", lw=1.0, zorder=2)
-    ax.plot([x0, x1], [(road_lo + road_hi) / 2] * 2, color="#c8a02a", lw=1.4,
+    ax.plot([x0, x1], [road_mid, road_mid], color="#c8a02a", lw=1.4,
             ls=(0, (7, 6)), zorder=2)                                          # centreline
-    ax.text(x0 + 0.15, road_lo + 0.32, "travelled way / live lane", ha="left",
-            va="center", fontsize=10.0, color="#4a4a4a")
     ax.text(8.6, road_hi + 0.13, "edgeline", ha="center", va="bottom",
             fontsize=10.0, color="#2b2b2b")
-    # direction of travel
-    _arrow(ax, (10.6, road_lo + 0.32), (14.2, road_lo + 0.32), color="#5a6b78",
-           lw=1.6, ms=15)
-    ax.text(12.4, road_lo + 0.32, "direction of travel", ha="center", va="bottom",
-            fontsize=10.0, color="#5a6b78")
 
-    # advanced warning sign (upstream)
-    post_top = road_hi + 0.8
+    # Near lane (adjacent to the worker) runs LEFT -> RIGHT, so traffic passes the
+    # sign before the work area. Opposing lane runs RIGHT -> LEFT.
+    near_y = road_lo + 0.75 * (road_hi - road_lo)
+    far_y = road_lo + 0.25 * (road_hi - road_lo)
+    _arrow(ax, (9.55, near_y), (14.45, near_y), color="#41586b", lw=1.7, ms=15)
+    ax.text(12.0, near_y + 0.34, "direction of travel", ha="center", va="center",
+            fontsize=10.0, color="#41586b")
+    _arrow(ax, (14.45, far_y), (9.55, far_y), color="#93a3ad", lw=1.3, ms=13)
+    ax.text(x0 + 0.15, far_y, "travelled way (two-way)", ha="left", va="center",
+            fontsize=10.0, color="#4a4a4a")
+
+    # advanced warning sign (upstream of the work area in the near lane)
+    post_top = road_hi + 0.80
     ax.plot([sign_x, sign_x], [road_hi, post_top], color="#333333", lw=2.0, zorder=4)
     ax.add_patch(Polygon([[sign_x, post_top], [sign_x - 0.36, post_top + 0.64],
                           [sign_x + 0.36, post_top + 0.64]], closed=True,
                          fc=OI_ORANGE, ec="#5a3d00", lw=1.3, zorder=5))
-    ax.text(sign_x, post_top + 0.96, "portable\nadvanced warning sign", ha="center",
+    ax.text(sign_x, post_top + 0.95, "portable\nadvanced warning sign", ha="center",
             va="bottom", fontsize=10.0, color="#5a3d00", linespacing=1.2,
             fontweight="bold")
 
@@ -317,45 +325,51 @@ def fig0a_worksite_layout():
             fontsize=10.0, color="#0b2233", zorder=5)
     ax.add_patch(Circle((worker_x, worker_y), 0.18, fc=OI_VERM, ec="#5a2400",
                         lw=1.0, zorder=6))
-    ax.text(worker_x, worker_y + 0.42, "worker on foot", ha="center", va="bottom",
+    ax.text(worker_x, worker_y + 0.50, "worker on foot", ha="center", va="bottom",
             fontsize=10.0, color="#5a2400")
 
     # deployment walk path (there and back) at offset c_deploy
-    ax.add_patch(FancyArrowPatch((worker_x, walk_y), (sign_x + 0.2, walk_y),
+    ax.add_patch(FancyArrowPatch((worker_x, walk_y), (sign_x + 0.48, walk_y),
                                  arrowstyle="<|-|>", mutation_scale=12, lw=1.8,
                                  color=OI_VERM, ls=(0, (5, 3)), zorder=3))
-    ax.text(7.4, walk_y + 0.12, "on-foot deployment walk\n(place + remove)",
+    ax.text(7.9, walk_y + 0.16, "on-foot deployment walk\n(place + remove)",
             ha="center", va="bottom", fontsize=10.0, color=OI_VERM, linespacing=1.2)
 
-    # dimension: d_AW (with dotted leaders from sign and worker)
-    ax.plot([sign_x, sign_x], [post_top + 0.6, daw_y], color="#aaaaaa", lw=0.7,
-            ls=":", zorder=1)
-    ax.plot([worker_x, worker_x], [5.78, daw_y], color="#aaaaaa", lw=0.7, ls=":",
+    # dimension: d_AW (dotted leaders start clear of every label)
+    ax.plot([sign_x, sign_x], [5.78, daw_y], color="#aaaaaa", lw=0.7, ls=":", zorder=1)
+    ax.plot([worker_x, worker_x], [7.12, daw_y], color="#aaaaaa", lw=0.7, ls=":",
             zorder=1)
     _dim(ax, (sign_x, daw_y), (worker_x, daw_y),
          "d$_{AW}$ ≈ 50 m   (advanced warning distance)", pt=10.0, lab_dy=0.26)
 
-    # dimension: c_deploy (lateral, left of centre)
-    _dim(ax, (4.7, road_hi), (4.7, walk_y), "", pt=10.0)
-    ax.text(4.45, (road_hi + walk_y) / 2, "c$_{deploy}$\n(0.5-2 m)", ha="right",
+    # dimension: c_deploy (lateral)
+    _dim(ax, (4.95, road_hi), (4.95, walk_y), "", pt=10.0)
+    ax.text(4.70, (road_hi + walk_y) / 2, "c$_{deploy}$\n(0.5-2 m)", ha="right",
             va="center", fontsize=10.0, color="#333333", linespacing=1.2)
-    # dimension: c_work (lateral, left of the worker; label placed above the walk band)
-    _dim(ax, (11.3, road_hi), (11.3, worker_y), "", pt=10.0)
-    ax.text(11.05, 4.55, "c$_{work}$ (1-3 m)", ha="right", va="center",
+    # dimension: c_work (lateral); label sits in the clear band above the walk label
+    _dim(ax, (11.30, road_hi), (11.30, worker_y), "", pt=10.0)
+    ax.text(11.05, 5.72, "c$_{work}$ (1-3 m)", ha="right", va="center",
             fontsize=10.0, color="#333333")
 
-    ax.text(x0, 0.34,
-            "Plan view (schematic). Lateral offsets are exaggerated relative to the "
-            "along-road distance for clarity.",
-            ha="left", va="center", fontsize=10.0, style="italic", color="#555555")
     _save(fig, "fig0a_worksite_layout")
 
 
 # =========================================================================== #
 # fig0b -- parameter map (NEW)
 # =========================================================================== #
+def _box_h(n_lines: int, *, title: bool = True) -> float:
+    """Height that actually contains the text _box() draws.
+
+    _box() starts the title 0.42 cm below the top, drops 0.62 cm to the body, and
+    each body line occupies ~0.47 cm at 10 pt with linespacing 1.35. Undersized
+    boxes were letting body text spill through the bottom border.
+    """
+    top = 0.42 + (0.62 if title else 0.0)
+    return top + 0.47 * n_lines + 0.34
+
+
 def fig0b_parameter_map():
-    H = 11.8
+    H = 13.4
     fig, ax = _schematic(W_CM, H)
 
     cream, cream_e = "#f4efe3", "#9c7f3d"
@@ -363,68 +377,82 @@ def fig0b_parameter_map():
     red_f, red_e = "#fbebe3", OI_VERM
     green_f, green_e = "#e6f4ec", OI_GREEN
 
-    ax.text(W_CM / 2, H - 0.3, "Inputs  →  three collision pathways  →  decision",
+    ax.text(W_CM / 2, H - 0.30, "Inputs  →  three collision pathways  →  decision",
             ha="center", va="top", fontsize=11.0, fontweight="bold", color="#333333")
 
-    # ---- Column 1: input groups ----
-    ix, iw = 0.35, 4.0
+    # ---- Column 1: input groups (top-down, each box sized to its own text) ----
+    ix, iw = 0.35, 4.15
     groups = [
-        ("Encroachment", ["rate r$_E$, reach α", "offsets c, lengths L"], 8.55),
-        ("Speed environment", ["μ$_V$, σ$_V$  →  V₀"], 6.95),
-        ("Sign response", ["p$_R$, ΔV, a, d$_{AW}$  →  V₁"], 5.45),
-        ("Deployment", ["v$_{walk}$, t$_{handle}$  →  T$_{deploy}$"], 3.95),
-        ("Severity curves", ["p$_w$(V),  p$_o$(ΔV)"], 2.45),
+        ("Encroachment", ["rate r$_E$, reach α", "offsets c, lengths L"]),
+        ("Speed environment", ["μ$_V$, σ$_V$  →  V₀"]),
+        ("Sign response", ["p$_R$, ΔV, a, d$_{AW}$  →  V₁"]),
+        ("Deployment", ["v$_{walk}$, t$_{handle}$  →  T$_{deploy}$"]),
+        ("Severity curves", ["p$_w$(V),  p$_o$(ΔV)"]),
     ]
     icy = []
-    for title, lines, y in groups:
-        h = 1.2 if len(lines) == 1 else 1.55
+    top = H - 1.35
+    for title, lines in groups:
+        h = _box_h(len(lines))
+        y = top - h
         _box(ax, ix, y, iw, h, lines, cream, cream_e, title=title, title_pt=10.5,
              body_pt=10.0, align="left")
         icy.append(y + h / 2)
+        top = y - 0.40
 
     # ---- Column 2: three pathways ----
-    px, pw = 6.05, 5.2
+    px, pw = 5.95, 5.35
+    ph = _box_h(2)
     paths = [
-        ("Pathway 1", ["Worker strike (work)", "λ$_w$ · p$_w$(V)"], 7.75, blue_f, blue_e),
-        ("Pathway 2", ["Work-vehicle strike (work)", "λ$_v$ · p$_o$(ΔV$_{occ}$)"], 5.35, blue_f, blue_e),
-        ("Pathway 3  (S₁ only)", ["Worker strike (deployment)", "λ$_d$ · p$_w$(V₀)"], 2.95, red_f, red_e),
+        ("Pathway 1", ["Worker strike (work)", "λ$_w$ · p$_w$(V)"], 9.30, blue_f, blue_e),
+        ("Pathway 2", ["Work-vehicle strike (work)", "λ$_v$ · p$_o$(ΔV$_{occ}$)"], 5.95, blue_f, blue_e),
+        ("Pathway 3  (S₁ only)", ["Worker strike (deployment)", "λ$_d$ · p$_w$(V₀)"], 2.60, red_f, red_e),
     ]
     pcy = []
     for title, lines, y, fc, ec in paths:
-        _box(ax, px, y, pw, 1.8, lines, fc, ec, title=title, title_pt=10.5,
+        _box(ax, px, y, pw, ph, lines, fc, ec, title=title, title_pt=10.5,
              body_pt=10.0, align="center")
-        pcy.append(y + 1.8 / 2)
+        pcy.append(y + ph / 2)
 
-    # ---- Column 3: outputs (Decision placed between the two harm terms so both
-    #      H(S0) and H(S1) feed it with clean, non-crossing arrows) ----
-    ox, ow = 12.15, 4.0
+    # ---- Column 3: outputs (Decision sits between the two harm terms) ----
+    ox, ow = 12.05, 4.10
     cx = ox + ow / 2
-    _box(ax, ox, 7.05, ow, 1.7, ["P1(V₀) + P2(V₀)"], blue_f, blue_e,
+    h0_h, dec_h, h1_h = _box_h(1), _box_h(3), _box_h(2)
+    h0_y, dec_y, h1_y = 9.75, 5.60, 1.60
+    _box(ax, ox, h0_y, ow, h0_h, ["P1(V₀) + P2(V₀)"], blue_f, blue_e,
          title="H(S₀)  no sign", title_pt=10.5, body_pt=10.0)
-    _box(ax, ox, 3.95, ow, 2.1, ["ΔH = H(S₁) - H(S₀)", "", "deploy if P(ΔH<0) ≥ p*"],
+    _box(ax, ox, dec_y, ow, dec_h, ["ΔH = H(S₁) - H(S₀)", "", "deploy if P(ΔH<0) ≥ p*"],
          green_f, green_e, title="Decision", title_pt=10.5, body_pt=10.0)
-    _box(ax, ox, 1.0, ow, 1.95, ["P1(V₁) + P2(V₁)", "+ P3 deploy"], red_f, red_e,
+    _box(ax, ox, h1_y, ow, h1_h, ["P1(V₁) + P2(V₁)", "+ P3 deploy"], red_f, red_e,
          title="H(S₁)  sign", title_pt=10.5, body_pt=10.0)
 
-    # ---- arrows: input groups -> pathways (kept sparse to avoid clutter) ----
+    # ---- arrows: input groups -> pathways ----
     a_in = dict(color=LGREY, lw=1.2, ms=11)
-    _arrow(ax, (ix + iw, icy[0]), (px, pcy[0] + 0.35), **a_in)   # encroachment -> P1
-    _arrow(ax, (ix + iw, icy[0] - 0.2), (px, pcy[1] + 0.2), **a_in)  # encroachment -> P2
-    _arrow(ax, (ix + iw, icy[1]), (px, pcy[0]), **a_in)         # speed -> P1
-    _arrow(ax, (ix + iw, icy[2]), (px, pcy[1] - 0.1), **a_in)   # response -> P2
-    _arrow(ax, (ix + iw, icy[3]), (px, pcy[2]), **a_in)         # deployment -> P3
-    _arrow(ax, (ix + iw, icy[4]), (px, pcy[2] - 0.35), **a_in)  # severity -> P3
+    _arrow(ax, (ix + iw, icy[0]), (px, pcy[0] + 0.45), **a_in)       # encroachment -> P1
+    _arrow(ax, (ix + iw, icy[0] - 0.25), (px, pcy[1] + 0.45), **a_in)  # encroachment -> P2
+    _arrow(ax, (ix + iw, icy[1]), (px, pcy[0] - 0.10), **a_in)       # speed -> P1
+    _arrow(ax, (ix + iw, icy[2]), (px, pcy[1] - 0.10), **a_in)       # response -> P2
+    _arrow(ax, (ix + iw, icy[3]), (px, pcy[2] + 0.30), **a_in)       # deployment -> P3
+    _arrow(ax, (ix + iw, icy[4]), (px, pcy[2] - 0.30), **a_in)       # severity -> P3
 
-    # ---- arrows: pathways -> harm terms ----
+    # ---- pathways -> harm terms.
+    # P1 and P2 feed BOTH strategies (evaluated at V0 and at V1), so they are
+    # bracketed once and routed with two labelled arrows instead of four crossing
+    # ones. P3 exists only under S1.
+    # The V0 / V1 evaluation is already written inside the H(S0) and H(S1) boxes,
+    # so the arrows carry no text and nothing lands on a box.
     a_p = dict(color=GREY, lw=1.5, ms=13)
-    _arrow(ax, (px + pw, pcy[0]), (ox, 8.1), **a_p)            # P1 -> H0
-    _arrow(ax, (px + pw, pcy[1]), (ox, 7.6), **a_p)           # P2 -> H0
-    _arrow(ax, (px + pw, pcy[0] - 0.2), (ox, 2.55), **a_p)    # P1 -> H1
-    _arrow(ax, (px + pw, pcy[1] - 0.2), (ox, 2.1), **a_p)     # P2 -> H1
-    _arrow(ax, (px + pw, pcy[2]), (ox, 1.65), color=OI_VERM, lw=1.6, ms=13)  # P3 -> H1
+    bx = px + pw + 0.42
+    ax.plot([bx, bx], [pcy[1], pcy[0]], color=GREY, lw=1.4, solid_capstyle="round")
+    ax.plot([px + pw, bx], [pcy[0], pcy[0]], color=GREY, lw=1.4)
+    ax.plot([px + pw, bx], [pcy[1], pcy[1]], color=GREY, lw=1.4)
+    bmid = (pcy[0] + pcy[1]) / 2
+    _arrow(ax, (bx, bmid), (ox, h0_y + 0.55), **a_p)                 # P1+P2 -> H(S0)
+    _arrow(ax, (bx, bmid), (ox, h1_y + h1_h - 0.55), **a_p)          # P1+P2 -> H(S1)
+    _arrow(ax, (px + pw, pcy[2]), (ox, h1_y + 0.62), color=OI_VERM, lw=1.6, ms=13)
+
     # both harm terms -> decision (down from H0, up from H1; no box piercing)
-    _arrow(ax, (cx, 7.05), (cx, 6.05), **a_p)                 # H0 -> decision
-    _arrow(ax, (cx, 2.95), (cx, 3.95), **a_p)                 # H1 -> decision
+    _arrow(ax, (cx, h0_y), (cx, dec_y + dec_h), **a_p)               # H0 -> decision
+    _arrow(ax, (cx, h1_y + h1_h), (cx, dec_y), **a_p)                # H1 -> decision
 
     _save(fig, "fig0b_parameter_map")
 
@@ -433,7 +461,7 @@ def fig0b_parameter_map():
 # fig2 -- warning effect
 # =========================================================================== #
 def fig2_warning_effect():
-    fig, axes = plt.subplots(1, 2, figsize=(W_IN, 8.0 * CM), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(W_IN, 9.9 * CM), constrained_layout=True)
 
     rng = np.random.default_rng(4)
     n = 300_000
@@ -449,28 +477,52 @@ def fig2_warning_effect():
                  color=C_SIGN, label=f"V$_1$  (sign; p$_R$={p_R:.1f}, ΔV={dV:.0f} km/h)")
     axes[0].set_xlabel("Operating speed at work location (km/h)")
     axes[0].set_ylabel("Probability density")
-    axes[0].legend(frameon=False, loc="upper left")
+    axes[0].set_ylim(0, 0.056)      # headroom so the legend clears the V0 peak
+    axes[0].legend(frameon=False, loc="upper left", fontsize=10.0)
     axes[0].set_title("(a) Bernoulli mixture of responders", loc="left")
 
-    v0 = np.linspace(20, 80, 200)
-    styles = {30: (":", "shortest 30 m"), 50: ("-", "typical 50 m"), 70: ("--", "longest 70 m")}
-    for d_aw, (ls, dlab) in styles.items():
-        for a, c in ((0.8, OI_SKY), (2.5, OI_BLUE)):
-            dmax = feasible_delta_v_kmh(v0, np.full_like(v0, a), np.full_like(v0, d_aw))
-            axes[1].plot(v0, np.minimum(dmax, v0), ls=ls, color=c, lw=1.6)
-    axes[1].axhline(15, color=C_SIGN, lw=1.4, ls="-.")
-    axes[1].set_xlabel("Approach speed V$_0$ (km/h)")
-    axes[1].set_ylabel("Maximum feasible ΔV (km/h)")
-    axes[1].set_title("(b) Kinematic feasibility bound", loc="left")
-    # two-part legend kept compact and inside
-    h_dist = [Line2D([0], [0], color="k", ls=ls, lw=1.6) for ls, _ in styles.values()]
-    h_acc = [Line2D([0], [0], color=OI_SKY, lw=1.6), Line2D([0], [0], color=OI_BLUE, lw=1.6),
-             Line2D([0], [0], color=C_SIGN, lw=1.4, ls="-.")]
-    leg1 = axes[1].legend(h_dist, [d for _, d in styles.values()], frameon=False,
-                          loc="upper left", title="d$_{AW}$", handlelength=2.2)
-    axes[1].add_artist(leg1)
-    axes[1].legend(h_acc, ["a = 0.8 m/s$^2$", "a = 2.5 m/s$^2$", "sampled ΔV cap (15 km/h)"],
-                   frameon=False, loc="lower right", handlelength=2.2)
+    # (b) The sampled reduction is ΔV ~ U(0,15) km/h, CAPPED by what a driver can
+    # actually shed over d_AW at a ~ U(0.8, 2.5) m/s^2. The question the panel must
+    # answer is simply: where does that cap bind? Six double-encoded curves buried
+    # it, so show the bound as an envelope against the sampled support instead.
+    def _bound(v, a, d):
+        return np.minimum(feasible_delta_v_kmh(v, np.full_like(v, a),
+                                               np.full_like(v, d)), v)
+
+    v0 = np.linspace(20, 80, 400)
+    lo = _bound(v0, 0.8, 30.0)      # shortest distance, gentlest braking
+    hi = _bound(v0, 2.5, 70.0)      # longest distance, firmest braking
+    typ = _bound(v0, 1.65, 50.0)    # mean deceleration at the typical distance
+
+    ax_b = axes[1]
+    ax_b.axvspan(35, 60, color="#ececec", zorder=0, label="modelled speed range")
+    ax_b.axhspan(0, 15, color=C_SIGN, alpha=0.13, lw=0, zorder=1,
+                 label="sampled ΔV (≤ 15 km/h)")
+    ax_b.fill_between(v0, lo, hi, color=OI_BLUE, alpha=0.20, lw=0, zorder=2,
+                      label="bound, d$_{AW}$ 30-70 m")
+    ax_b.plot(v0, typ, color=OI_BLUE, lw=1.9, zorder=3, label="bound, typical")
+    ax_b.plot(v0, lo, color=OI_BLUE, lw=0.9, ls=":", zorder=3)
+    ax_b.plot(v0, hi, color=OI_BLUE, lw=0.9, ls=":", zorder=3)
+
+    # Where the worst-case bound drops under the 15 km/h cap, the kinematics -- not
+    # the sampled cap -- limit the achievable reduction.
+    # Mark where the worst-case bound crosses the cap; the sentence explaining it
+    # lives in the caption, so no text sits on a curve.
+    below = np.where(lo < 15.0)[0]
+    if below.size:
+        v_cross = float(v0[below[0]])
+        ax_b.plot([v_cross], [15.0], marker="o", ms=4.5, color="#333333", zorder=5)
+        ax_b.annotate(f"≈{v_cross:.0f} km/h", xy=(v_cross, 15.0), xytext=(33.0, 5.5),
+                      fontsize=10.0, color="#333333", ha="left", va="center",
+                      arrowprops=dict(arrowstyle="-", color="#666666", lw=0.9))
+
+    ax_b.set_xlim(20, 80)
+    ax_b.set_ylim(0, 74)
+    ax_b.set_xlabel("Approach speed V$_0$ (km/h)")
+    ax_b.set_ylabel("Achievable ΔV (km/h)")
+    ax_b.set_title("(b) Kinematic bound on ΔV", loc="left")
+    ax_b.legend(frameon=False, loc="upper left", fontsize=10.0, handlelength=1.5,
+                borderpad=0.2, labelspacing=0.3, handletextpad=0.5)
     _save(fig, "fig2_warning_effect")
 
 
@@ -486,8 +538,10 @@ def fig3_severity_curves():
     axes[0].plot(v, p_worker(v, "rosen_fatality"), color=C_FATAL, lw=2.0, ls="--",
                  label="Fatality")
     axes[0].axvspan(35, 60, color="#ececec", zorder=0)
-    axes[0].text(47.5, 0.62, "modelled\nspeed range", ha="center", va="center",
-                 fontsize=10.0, color="#555555")
+    # Sit the band label vertically along the band's leading edge, in the empty
+    # wedge above both curves and below the legend, so it never crosses a line.
+    axes[0].text(37.3, 0.55, "modelled speed range", rotation=90, ha="center",
+                 va="center", fontsize=10.0, color="#555555")
     axes[0].set_xlabel("Impact speed (km/h)")
     axes[0].set_ylabel("Probability of outcome")
     axes[0].set_title("(a) Worker (person on foot)", loc="left")
@@ -509,54 +563,93 @@ def fig3_severity_curves():
 
 
 # =========================================================================== #
-# fig4 -- P(dH<0) heatmaps (0.5-centred diverging, zoomed + annotated)
+# fig4 -- P(dH<0) vs duration, with the traffic-flow range as a band.
+#
+# This replaces the old 2x2 P heatmap AND the old 2x2 P-vs-duration line grid.
+# Both plotted the same quantity over the same Q x T grid: the heatmap spent a
+# full 0-1 diverging scale on data that never left 0.12-0.16 or 0.51-0.60, and
+# the line grid drew three Q series that landed exactly on top of one another.
+# The reason both looked empty is itself the finding -- P is invariant to flow --
+# so plot the flow range as a band and let its width carry that result.
 # =========================================================================== #
-def fig4_probability_heatmaps():
-    fig, axes = plt.subplots(2, 2, figsize=(W_IN, 15.6 * CM), sharex=True, sharey=True,
-                             constrained_layout=True)
-    norm = mcolors.TwoSlopeNorm(vmin=0.1, vcenter=0.5, vmax=0.9)
-    cmap = plt.get_cmap("RdBu")
-    im = None
-    for ax, (tag, label) in zip(axes.flat, CASES):
-        piv = _pivot(g(tag), "p_benefit")
-        im = ax.imshow(piv.values, aspect="auto", origin="lower", cmap=cmap, norm=norm)
-        _heat_axes(ax, piv)
-        _frame(ax)
-        ax.set_title(label, loc="left", fontsize=10.5)
-        for i in range(piv.shape[0]):
-            for j in range(piv.shape[1]):
-                val = piv.values[i, j]
-                color = "white" if val < 0.30 else "#111111"
-                ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=10.0,
-                        color=color)
-    for ax in axes[1]:
-        ax.set_xlabel("Traffic flow Q (veh/h)")
-    for ax in axes[:, 0]:
-        ax.set_ylabel("Work duration")
-    cb = fig.colorbar(im, ax=axes, shrink=0.9, pad=0.02,
-                      ticks=[0.1, 0.3, 0.5, 0.7, 0.8, 0.9], extend="both")
-    cb.set_label("P(ΔH < 0)   (blue = sign beneficial)")
-    # mark the two decision thresholds on the colourbar itself
-    for yv in (0.5, 0.8):
-        cb.ax.axhline(yv, color="#111111", lw=1.2, ls=(0, (3, 2)))
-    fig.suptitle("Colour scale centred at 0.5; no scenario reaches the p* = 0.8 "
-                 "threshold (highest = 0.60)", fontsize=10.5, color="#333333")
-    _save(fig, "fig4_probability_heatmaps")
+def fig4_p_vs_duration():
+    fig, ax = plt.subplots(figsize=(W_IN, 11.2 * CM), constrained_layout=True)
+
+    # colour = response assumption, line style = deployment speed. Encoding the two
+    # factors separately keeps the legend to four short entries instead of four
+    # long ones that squeezed the axes.
+    series = [
+        ("baseline", C_SIGN, "-", "o"),
+        ("baseline_fastDeploy", C_SIGN, "--", "s"),
+        ("highPR", OI_BLUE, "-", "o"),
+        ("high_PR_fastDeploy", OI_BLUE, "--", "s"),
+    ]
+
+    # decision zones
+    ax.axhspan(0.0, 0.5, color=C_NOTSUP, alpha=0.06, lw=0, zorder=0)
+    ax.axhspan(0.5, 0.8, color=C_UNCERT, alpha=0.09, lw=0, zorder=0)
+    ax.axhspan(0.8, 1.0, color=C_SUP, alpha=0.10, lw=0, zorder=0)
+    ax.axhline(0.5, color="#777777", lw=1.0, ls="--", zorder=1)
+    ax.axhline(0.8, color="#777777", lw=1.0, ls=":", zorder=1)
+
+    widest = 0.0
+    for tag, c, ls, mk in series:
+        df = g(tag)
+        grp = df.groupby("T_work_h").p_benefit
+        Ts = np.array(sorted(df.T_work_h.unique()))
+        lo, hi = grp.min().reindex(Ts).values, grp.max().reindex(Ts).values
+        mid = grp.mean().reindex(Ts).values
+        widest = max(widest, float(np.max(hi - lo)))
+        ax.fill_between(Ts, lo, hi, color=c, alpha=0.30, lw=0, zorder=2)
+        ax.plot(Ts, mid, color=c, ls=ls, marker=mk, ms=4.5, lw=1.7, zorder=3)
+
+    ax.set_xscale("log")
+    ax.set_xticks(list(T_LABELS))
+    ax.set_xticklabels(list(T_LABELS.values()))
+    ax.minorticks_off()
+    ax.set_ylim(0, 1)
+    ax.set_xlim(0.043, 4.8)
+    ax.set_xlabel("Work duration")
+    ax.set_ylabel("P(ΔH < 0)")
+
+    # zone captions in the empty left margin of each band, clear of every series
+    for yv, txt, col in ((0.30, "sign not supported", C_NOTSUP),
+                         (0.70, "uncertain", "#4a4a4a"),
+                         (0.91, "sign supported", C_SUP)):
+        ax.text(0.046, yv, txt, ha="left", va="center", fontsize=10.0, color=col)
+
+    ax.set_title(f"Band spans the seven traffic flows (50-1000 veh/h); width "
+                 f"≤ {widest:.3f},\nso P(ΔH < 0) is effectively independent of flow",
+                 loc="left", fontsize=10.5, color="#333333")
+
+    handles = [
+        Line2D([0], [0], color=C_SIGN, lw=2.6),
+        Line2D([0], [0], color=OI_BLUE, lw=2.6),
+        Line2D([0], [0], color="#444444", lw=1.7, ls="-", marker="o", ms=4.5),
+        Line2D([0], [0], color="#444444", lw=1.7, ls="--", marker="s", ms=4.5),
+    ]
+    labels = ["Standard response", "Optimistic response",
+              "Standard deployment", "Faster deployment"]
+    fig.legend(handles, labels, frameon=False, loc="outside lower center", ncol=2,
+               fontsize=10.0, handlelength=2.2, columnspacing=2.4)
+    _save(fig, "fig4_p_vs_duration")
 
 
 # =========================================================================== #
 # fig5 -- mean dH heatmaps
 # =========================================================================== #
-def _fmt_dh(v: float) -> str:
-    # compact (<= 4 glyphs) so 7 columns of annotations never collide at >=10 pt
-    a = abs(v)
-    if a < 0.05:
-        return "0"
-    return f"{v:+.1f}"
-
-
 def fig5_mean_dh_heatmaps():
-    fig, axes = plt.subplots(2, 2, figsize=(W_IN, 15.6 * CM), sharex=True, sharey=True,
+    """Mean dH over the Q x T grid.
+
+    Per-cell numbers were removed. Mean dH spans four orders of magnitude across
+    the grid (1.5e-4 to 4.3 per 10^6 jobs), so no fixed-decimal label resolves it:
+    at one decimal place a third of the cells printed a bare "0" while staying
+    strongly coloured, and at two decimal places the labels collided across the
+    seven columns. The symlog colourbar already carries magnitude and sign, so the
+    only thing missing was the sign change itself -- now drawn as the dH = 0
+    contour. Exact representative values are tabulated in Table 3.
+    """
+    fig, axes = plt.subplots(2, 2, figsize=(W_IN, 14.6 * CM), sharex=True, sharey=True,
                              constrained_layout=True)
     vals = pd.concat([g(t)["mean_deltaH"] for t, _ in CASES]) * 1e6
     lim = float(np.abs(vals).max())
@@ -569,56 +662,20 @@ def fig5_mean_dh_heatmaps():
         _heat_axes(ax, piv)
         _frame(ax)
         ax.set_title(label, loc="left", fontsize=10.5)
-        for i in range(piv.shape[0]):
-            for j in range(piv.shape[1]):
-                val = piv.values[i, j]
-                nv = norm(val)
-                color = "white" if (nv < 0.22 or nv > 0.78) else "#111111"
-                ax.text(j, i, _fmt_dh(val), ha="center", va="center", fontsize=10.0,
-                        color=color)
+        # dH = 0 boundary: where the sign stops adding harm and starts removing it
+        if piv.values.min() < 0.0 < piv.values.max():
+            nr, nc = piv.shape
+            ax.contour(np.arange(nc), np.arange(nr), piv.values, levels=[0.0],
+                       colors="#1a1a1a", linewidths=1.4, linestyles="--")
     for ax in axes[1]:
         ax.set_xlabel("Traffic flow Q (veh/h)")
     for ax in axes[:, 0]:
         ax.set_ylabel("Work duration")
     cb = fig.colorbar(im, ax=axes, shrink=0.9, pad=0.02, aspect=32)
     cb.set_label("Mean ΔH  (MAIS 3+ per 10⁶ jobs)")
-    fig.suptitle("Blue = sign reduces mean harm (ΔH < 0);  red = sign adds harm",
-                 fontsize=10.5, color="#333333")
+    fig.suptitle("Blue = sign reduces mean harm (ΔH < 0);  red = sign adds harm;  "
+                 "dashed line = ΔH = 0", fontsize=10.5, color="#333333")
     _save(fig, "fig5_mean_dh_heatmaps")
-
-
-# =========================================================================== #
-# fig6 -- P(dH<0) vs duration
-# =========================================================================== #
-def fig6_p_vs_duration():
-    fig, axes = plt.subplots(2, 2, figsize=(W_IN, 14.5 * CM), sharex=True, sharey=True,
-                             constrained_layout=True)
-    colors = {50: OI_SKY, 400: OI_BLUE, 1000: "#083b5c"}
-    for ax, (tag, label) in zip(axes.flat, CASES):
-        df = g(tag)
-        for Q, c in colors.items():
-            sub = df[df.Q_veh_h == Q].sort_values("T_work_h")
-            ax.plot(sub.T_work_h, sub.p_benefit, marker="o", ms=4, lw=1.6,
-                    color=c, label=f"Q = {Q} veh/h")
-            ax.fill_between(sub.T_work_h, sub.p_benefit_lo95, sub.p_benefit_hi95,
-                            color=c, alpha=0.16, lw=0)
-        ax.axhline(0.5, color="#777777", lw=1.0, ls="--")
-        ax.axhline(0.8, color="#777777", lw=1.0, ls=":")
-        ax.set_xscale("log")
-        ax.set_xticks(list(T_LABELS))
-        ax.set_xticklabels(list(T_LABELS.values()), rotation=40, ha="right")
-        ax.set_title(label, loc="left", fontsize=10.5)
-        ax.set_ylim(0, 1)
-    axes[0, 0].legend(frameon=False, loc="upper left", bbox_to_anchor=(0.03, 0.74))
-    axes[0, 1].text(0.05, 0.5, "0.5", transform=axes[0, 1].get_yaxis_transform(),
-                    fontsize=10.0, color="#666666", va="bottom", ha="left")
-    axes[0, 1].text(0.05, 0.8, "0.8", transform=axes[0, 1].get_yaxis_transform(),
-                    fontsize=10.0, color="#666666", va="bottom", ha="left")
-    for ax in axes[1]:
-        ax.set_xlabel("Work duration")
-    for ax in axes[:, 0]:
-        ax.set_ylabel("P(ΔH < 0)")
-    _save(fig, "fig6_p_vs_duration")
 
 
 # =========================================================================== #
@@ -631,7 +688,7 @@ def fig7_decision_classification():
     for tag, label in CASES:
         df = g(tag)
         rows.append({
-            "label": label.replace("\n", " "),
+            "label": label,                      # keep the two-line form for the y axis
             "pmin": df.p_benefit.min(), "pmax": df.p_benefit.max(),
             "lo": df.p_benefit_lo95.min(), "hi": df.p_benefit_hi95.max(),
         })
@@ -648,11 +705,10 @@ def fig7_decision_classification():
         supported = r["lo"] >= 0.8
         notsup = r["hi"] < 0.5
         col = C_SUP if supported else (C_NOTSUP if notsup else C_UNCERT)
-        verdict = ("sign supported" if supported else
-                   ("sign not supported" if notsup else "uncertain"))
-        # case description sits ABOVE its bar (frees the y-axis of long labels)
-        ax.text(0.012, yi + 0.30, r["label"], ha="left", va="bottom", fontsize=10.0,
-                color="#333333")
+        # Match the zone captions verbatim and keep them short enough that the
+        # label never runs across the p* = 0.5 threshold line.
+        verdict = ("supported" if supported else
+                   ("not supported" if notsup else "uncertain"))
         # 95% CI envelope across the whole grid (thin) + point-estimate span (thick)
         ax.plot([r["lo"], r["hi"]], [yi, yi], color=col, lw=2.0, alpha=0.55,
                 solid_capstyle="round", zorder=3)
@@ -662,27 +718,32 @@ def fig7_decision_classification():
         ax.annotate(verdict, (max(r["hi"], r["pmax"]) + 0.02, yi), va="center",
                     ha="left", fontsize=10.0, color=col, fontweight="bold")
 
-    ax.set_yticks([])
-    ax.set_ylim(-0.7, len(rows) + 0.05)
+    # Case descriptions belong on the y axis. Drawn inside the axes they ran
+    # straight through the p* = 0.5 threshold line.
+    ax.set_yticks(y)
+    ax.set_yticklabels([r["label"] for r in rows], fontsize=10.0)
+    ax.tick_params(axis="y", length=0)
+    ax.set_ylim(-0.6, len(rows) - 0.15)
     ax.set_xlim(0, 1.0)
-    ax.set_xlabel("P(ΔH < 0):   probability the sign reduces net serious harm")
+    ax.set_xlabel("Probability the sign reduces net serious harm, P(ΔH < 0)")
     ax.spines["left"].set_visible(False)
     # short zone captions along the top
-    ax.text(0.25, len(rows) - 0.32, "not supported", ha="center", va="bottom",
+    ax.text(0.25, len(rows) - 0.55, "not supported", ha="center", va="bottom",
             fontsize=10.0, color=C_NOTSUP)
-    ax.text(0.65, len(rows) - 0.32, "uncertain", ha="center", va="bottom",
+    ax.text(0.65, len(rows) - 0.55, "uncertain", ha="center", va="bottom",
             fontsize=10.0, color="#4a4a4a")
-    ax.text(0.90, len(rows) - 0.32, "supported", ha="center", va="bottom",
+    ax.text(0.90, len(rows) - 0.55, "supported", ha="center", va="bottom",
             fontsize=10.0, color=C_SUP)
     handles = [
         Line2D([0], [0], color=GREY, lw=9.0, solid_capstyle="round"),
         Line2D([0], [0], color=GREY, lw=2.0, alpha=0.55, solid_capstyle="round"),
     ]
-    ax.legend(handles, ["P(ΔH<0) across the 49-scenario grid",
-                        "95% Wilson-interval envelope"],
-              frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2)
-    ax.set_title("Decision is identical across all 49 scenarios; no case reaches "
-                 "'supported'", loc="left", fontsize=10.5)
+    fig.legend(handles, ["P(ΔH<0) across the 49-scenario grid",
+                         "95% Wilson-interval envelope"],
+               frameon=False, loc="outside lower center", ncol=2, columnspacing=2.4)
+    # Long two-line y labels narrow the axes, so keep the title short enough to fit.
+    ax.set_title("Decision is identical across all 49 scenarios", loc="left",
+                 fontsize=10.5)
     _save(fig, "fig7_decision_classification")
 
 
@@ -720,9 +781,15 @@ def fig8_prcc():
         ax.axvline(0, color="#333333", lw=0.8)
         ax.set_xlabel("PRCC  (95% bootstrap CI)")
         ax.set_title(title, loc="left", fontsize=10.5)
-        ax.set_xlim(-1, 1)
-    axes[0].legend(frameon=False, title="Work duration", loc="lower right", ncol=3,
-                   columnspacing=1.1, handlelength=1.3)
+        # No PRCC (or CI bound) leaves [-0.35, 0.80]; a full [-1, 1] axis spent
+        # half its width on emptiness and forced the legend on top of the bars.
+        ax.set_xlim(-0.42, 0.86)
+    # One legend for both panels, below the figure -- never over the data.
+    # "outside lower center" makes constrained_layout reserve the strip for it.
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, frameon=False, title="Work duration",
+               loc="outside lower center", ncol=3, columnspacing=1.6,
+               handlelength=1.4)
     _save(fig, "fig8_prcc")
 
 
@@ -735,8 +802,7 @@ def fig9_ke_requirement():
     fig, ax = plt.subplots(figsize=(W_IN, 8.4 * CM), constrained_layout=True)
     Ts = sorted(float(t) for t in ke["0.5"].keys())
     vals = [ke["0.5"][str(T)] for T in Ts]
-    ax.plot(Ts, vals, marker="o", ms=6, lw=1.8, color=OI_BLUE,
-            label="Required departure reduction")
+    ax.plot(Ts, vals, marker="o", ms=6, lw=1.8, color=OI_BLUE)
     for T, v in zip(Ts, vals):
         ax.annotate(f"{int(round(v*100))}%", (T, v), textcoords="offset points",
                     xytext=(0, 9), ha="center", fontsize=10.0, color="#1a1a1a")
@@ -748,7 +814,7 @@ def fig9_ke_requirement():
     ax.set_ylim(0, 0.18)
     ax.set_xlabel("Work duration")
     ax.set_ylabel("Minimum reduction in\nwork-period road departures")
-    ax.legend(frameon=False, loc="upper right")
+    # Single series, already point-labelled -- a legend adds nothing.
     ax.set_title("Requirement is identical for the p* = 0.5 and p* = 0.8 thresholds",
                  loc="left", fontsize=10.5)
     _save(fig, "fig9_ke_requirement")
@@ -781,14 +847,15 @@ def figS1_convergence():
 
 if __name__ == "__main__":
     print("figures ->", FIG)
+    # Manuscript figure order (9 figures):
+    #   1 fig0a  2 fig0b  3 fig2  4 fig3  5 fig4  6 fig5  7 fig7  8 fig8  9 fig9
+    # fig1_model_schematic is superseded by fig0b and is not used in the paper.
     fig0a_worksite_layout()
     fig0b_parameter_map()
-    fig1_model_schematic()
     fig2_warning_effect()
     fig3_severity_curves()
-    fig4_probability_heatmaps()
+    fig4_p_vs_duration()
     fig5_mean_dh_heatmaps()
-    fig6_p_vs_duration()
     fig7_decision_classification()
     fig8_prcc()
     fig9_ke_requirement()
