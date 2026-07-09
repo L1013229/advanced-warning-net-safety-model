@@ -15,21 +15,25 @@ pip install -e .[dev]   # Python >= 3.10
 ## Run
 
 ```bash
-python scripts/run_suite.py          # full analysis grid + robustness suite
-python scripts/make_figures.py       # regenerate every manuscript figure
-python scripts/make_results_digest.py
 pytest                               # test suite, including a bit-exact reproduction gate
+python scripts/run_suite.py          # full analysis suite: primary grid, correlation,
+                                     # response-allocation, encroachment-reduction,
+                                     # sensitivity, convergence, and validation phases
 ```
 
-Results are written to `outputs/` (gitignored).
+`pytest` also works directly from a clean checkout without installing (the test
+configuration adds `src/` to the import path). Results are written to `outputs/`
+(gitignored); every run records its fully merged configuration and run metadata
+so any number in the paper traces to the exact inputs that produced it.
 
 ## Structure
 
-- `src/aw_model/` — model package: input distributions, injury-severity risk functions, the encroachment/harm model, and the sensitivity analysis (PRCC).
-- `config/` — base parameters, scenario grids, correlation structures, and severity-curve variants.
-- `scripts/` — run the suite, generate figures, build the results digest.
-- `tests/` — unit tests and a bit-exact reproduction gate against the reference outputs.
-- `paper/` — manuscript source, reference list, and supplementary material.
+- `src/aw_model/` — model package: input distributions and Iman-Conover rank correlation, injury-severity risk functions, the encroachment/harm model, and the sensitivity analysis (PRCC with bootstrap confidence intervals).
+- `config/` — base parameters plus overlay files for the scenario, correlation, and severity-curve variants reported in the paper.
+- `scripts/run_suite.py` — executes the full analysis reported in the paper.
+- `tests/` — unit and structural tests, including a bit-exact reproduction gate against the reference outputs of the earlier model version.
+
+The manuscript and supplementary material are available from the journal; this repository carries the current, final version of the analysis code that implements and executes the method.
 
 ## Citation
 
