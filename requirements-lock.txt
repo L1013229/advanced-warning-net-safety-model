@@ -1,0 +1,18 @@
+# Exact environment the results of record were produced under.
+#
+# pyproject.toml carries loose `>=` floors, which is right for someone who
+# just wants to run the model. It is not enough to reproduce a published
+# number: `pip install -e .[dev]` resolves to whatever is current on the day,
+# and a NumPy release that changes a sampler or a reduction moves the answer
+# with nothing to show for it.
+#
+# The reproducibility workflow installs from THIS file. Regenerating the
+# results of record after a bump here is a deliberate act with its own commit.
+#
+# Verified on Python 3.14.3, Linux x86-64, 2026-07-25.
+
+numpy==2.4.2
+pandas==3.0.1
+PyYAML==6.0.3
+pyarrow==23.0.1
+pytest==9.0.3
