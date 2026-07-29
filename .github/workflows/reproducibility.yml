@@ -1,0 +1,84 @@
+name: Reproducibility
+
+# Pinned reproducibility gate for the published model.
+#
+# The point is not "the tests pass" -- it is that the numbers this repository
+# reports can be regenerated from a fixed interpreter, a fixed dependency
+# graph and fixed seeds, and that any drift shows up as a failure rather than
+# as a quietly different run.
+#
+# Three things are pinned, and each of them can move a result on its own:
+#   1. the interpreter and the dependency versions (requirements-lock.txt),
+#   2. the RNG seeds and their consumption order (config + CANONICAL_DIST_ORDER),
+#   3. BLAS threading, because the Iman-Conover path goes through LAPACK and
+#      a different thread count can change the last bits of a decomposition.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Determinism knobs. PYTHONHASHSEED pins any dict/set ordering that could
+  # leak into an iteration order; the thread caps pin the BLAS backend so a
+  # runner with a different core count cannot change a decomposition.
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  NUMEXPR_NUM_THREADS: "1"
+  VECLIB_MAXIMUM_THREADS: "1"
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04   # pinned image, not `ubuntu-latest`
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pinned interpreter
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14.3"
+
+      - name: Pinned dependency graph
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-deps -r requirements-lock.txt
+          pip install --no-deps -e .
+          pip freeze
+
+      - name: Record the environment being tested
+        run: |
+          python - <<'PY'
+          import platform, numpy, pandas, yaml
+          print("python  ", platform.python_version(), platform.machine())
+          print("numpy   ", numpy.__version__)
+          print("pandas  ", pandas.__version__)
+          print("pyyaml  ", yaml.__version__)
+          numpy.show_config()
+          PY
+
+      # The stream-order guard first: if the RNG consumption order is wrong,
+      # every downstream number is wrong, and a failure here explains the rest.
+      - name: RNG stream order is enforced
+        run: pytest tests/test_stream_order.py -q
+
+      - name: Reproduce the v0.1 model version (regression against the past)
+        run: pytest tests/test_reproduction.py -q
+
+      - name: Reproduce this version's results of record
+        run: pytest tests/test_result_of_record.py -q
+
+      # Belt and braces: regenerate the record from scratch and require a
+      # byte-identical file. The test above compares values through pandas;
+      # this compares the artefact itself, so a change in how the record is
+      # serialised cannot hide.
+      - name: Results of record regenerate byte-identically
+        run: python scripts/make_results_of_record.py --check
+
+      - name: Full suite
+        run: pytest -q
