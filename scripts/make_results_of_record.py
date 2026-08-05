@@ -88,6 +88,68 @@ def build() -> pd.DataFrame:
     return pd.concat([run_case(c, o) for c, o in CASES.items()], ignore_index=True)
 
 
+# Columns whose last bits are NOT fixed across microarchitectures, and the tolerance each is
+# allowed. Same split the test suite declares: p_benefit and its bounds come from a counting
+# path and are bit-exact; the deltaH family comes through LAPACK, where reduction order differs
+# by CPU.
+BIT_EXACT_COLUMNS = ("p_benefit", "p_benefit_lo95", "p_benefit_hi95")
+TOLERANCE_COLUMNS = ("mean_deltaH", "median_deltaH", "median_rel_deltaH")
+RTOL = 1e-9
+
+
+def _check_against(fresh) -> int:
+    """Compare a fresh build to the checked-in record, VALUE-wise rather than byte-wise.
+
+    A raw text comparison demands that the record regenerate byte-identically on any machine.
+    That is false by construction here: mean_deltaH and its siblings come through a LAPACK path
+    whose reduction order depends on the CPU, so the last bits move between hosts.
+
+    The consequence was not theoretical. This step was green on the branch that produced the
+    record (2026-07-27) and red on main from the 2026-07-29 merge, with the SAME pinned
+    interpreter and the same numpy 2.4.2 / pandas 3.0.1. The only difference was the runner's
+    CPU. A reproducibility gate that can only pass on the machine that wrote the artifact is not
+    checking reproducibility; it is checking that nothing moved.
+
+    So: bit-exact where the suite says bit-exact, declared tolerance where it says tolerance, and
+    a real failure -- a changed model, a changed config -- still fails, because it moves values
+    far outside 1e-9.
+    """
+    import numpy as np
+    import pandas as pd
+
+    want = pd.read_csv(OUT, float_precision="round_trip")
+    if len(want) != len(fresh):
+        print(f"{OUT}: row count changed {len(want)} -> {len(fresh)}", file=sys.stderr)
+        return 1
+    if list(want.columns) != list(fresh.columns):
+        print(f"{OUT}: columns changed", file=sys.stderr)
+        return 1
+
+    merged = fresh.merge(want, on=["case", "Q_veh_h", "T_work_h"], suffixes=("_now", "_rec"))
+    if len(merged) != len(fresh):
+        print(f"{OUT}: grid points did not line up", file=sys.stderr)
+        return 1
+
+    for col in BIT_EXACT_COLUMNS:
+        bad = merged[merged[f"{col}_now"] != merged[f"{col}_rec"]]
+        if not bad.empty:
+            print(f"{OUT}: {col} is not bit-exact at {len(bad)} of {len(merged)} points",
+                  file=sys.stderr)
+            return 1
+
+    for col in TOLERANCE_COLUMNS:
+        try:
+            np.testing.assert_allclose(merged[f"{col}_now"], merged[f"{col}_rec"],
+                                       rtol=RTOL, atol=0)
+        except AssertionError as exc:
+            print(f"{OUT}: {col} exceeds rtol={RTOL:g}\n{exc}", file=sys.stderr)
+            return 1
+
+    print(f"{OUT}: up to date ({len(fresh)} rows; "
+          f"{len(BIT_EXACT_COLUMNS)} bit-exact, {len(TOLERANCE_COLUMNS)} at rtol={RTOL:g})")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="exit 1 if the CSV would change")
@@ -103,11 +165,7 @@ def main(argv: list[str] | None = None) -> int:
         if not OUT.exists():
             print(f"{OUT} does not exist", file=sys.stderr)
             return 1
-        if OUT.read_text(encoding="utf-8") != text:
-            print(f"{OUT} is out of date with the current code/config", file=sys.stderr)
-            return 1
-        print(f"{OUT}: up to date ({len(fresh)} rows)")
-        return 0
+        return _check_against(fresh)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(text, encoding="utf-8")
