@@ -33,6 +33,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import io
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -142,13 +144,35 @@ def test_the_record_is_not_itself_a_rounding_step(record: pd.DataFrame) -> None:
     Storing the reference at reduced precision would make the gate compare a
     rounded number to a full one -- the same double-rounding shape that put a
     wrong last digit into a reported table in the first place.
+
+    THIS TESTS STORAGE, AND ONLY STORAGE.
+
+    The previous implementation re-ran the model and demanded `==` against the
+    record for TOLERANCE_COLUMNS as well as BIT_EXACT_COLUMNS. That conflated two
+    different properties and contradicted the suite's own vocabulary: mean_deltaH
+    and median_deltaH are declared TOLERANCE columns precisely because they come
+    through a LAPACK path whose last bits are not fixed across microarchitectures,
+    and the sibling test checks them at rtol 1e-9.
+
+    So it passed on the machine the record was generated on and failed everywhere
+    else. Green on branch 2026-07-27, red on main from 2026-07-29 with the same
+    pinned interpreter and the same numpy 2.4.2 / pandas 3.0.1 -- the difference was
+    the CPU, not the code. A reproducibility gate that can only pass on one host is
+    not a reproducibility gate.
+
+    Round-tripping the record through CSV and back tests the stated property with no
+    arithmetic in the way, so it holds on any machine. Bit-exactness where it IS
+    required is unchanged: test_current_code_reproduces_the_results_of_record still
+    demands `!=`-free equality on BIT_EXACT_COLUMNS.
     """
-    got = run_case("baseline", CASES["baseline"])
-    want = record[record["case"] == "baseline"]
-    merged = got.merge(want, on=["Q_veh_h", "T_work_h"], suffixes=("_now", "_rec"))
+    buffer = io.StringIO()
+    record.to_csv(buffer, index=False)
+    reread = pd.read_csv(io.StringIO(buffer.getvalue()), float_precision="round_trip")
     for col in TOLERANCE_COLUMNS + BIT_EXACT_COLUMNS:
-        assert (merged[f"{col}_now"] == merged[f"{col}_rec"]).all(), (
-            f"{col}: the checked-in record does not round-trip float64 exactly"
+        assert (record[col] == reread[col]).all(), (
+            f"{col}: the checked-in record does not round-trip float64 exactly -- "
+            f"the stored text loses bits, so the gate would compare a rounded number "
+            f"to a full one"
         )
 
 
