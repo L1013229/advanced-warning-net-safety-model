@@ -1,14 +1,12 @@
 [project]
 name = "aw-net-risk-model"
-version = "1.0.0"
+version = "1.2.0"
 description = "Probabilistic net-safety-benefit model for portable advanced warning signs in low-impact roadside work (PhD Paper 5)"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",
     "pandas>=2.0",
     "pyyaml>=6.0",
-    "matplotlib>=3.7",
-    "scipy>=1.10",
     "pyarrow>=14.0",
 ]
 
@@ -17,6 +15,7 @@ dev = ["pytest>=7.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 
 [build-system]
 requires = ["setuptools>=68"]

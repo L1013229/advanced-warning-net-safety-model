@@ -86,6 +86,23 @@ def validate_config(cfg: Dict[str, Any]) -> None:
     missing_d = [name for name in CANONICAL_DIST_ORDER if name not in dists]
     if missing_d:
         raise ConfigError(f"Config missing distributions: {missing_d}")
+    # Order, not just presence. sample_all draws one array per distribution
+    # from a single seeded Generator, so the order of this mapping decides
+    # which slice of the RNG stream each variable receives. A reorder -- a
+    # YAML tidy-up, a formatter's alphabetical sort, an overlay adding a key
+    # -- would change every sampled value with no other visible difference.
+    # Checking presence alone let that through.
+    actual = tuple(dists)
+    if actual != CANONICAL_DIST_ORDER:
+        extra = [n for n in actual if n not in CANONICAL_DIST_ORDER]
+        detail = f"unexpected distributions {extra}; " if extra else ""
+        raise ConfigError(
+            "Config distribution order does not match CANONICAL_DIST_ORDER "
+            f"({detail}expected {CANONICAL_DIST_ORDER}, got {actual}). "
+            "Reordering or adding a distribution changes the RNG stream and "
+            "therefore every result; if the change is intended, update "
+            "CANONICAL_DIST_ORDER and regenerate the results of record."
+        )
     for name, spec in dists.items():
         if "dist" not in spec:
             raise ConfigError(f"Distribution '{name}' missing 'dist' field")

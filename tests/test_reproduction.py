@@ -39,7 +39,13 @@ def test_reproduces_v01_grid(fixture, overlays):
     # by Wang 2022 in production). Reproduction must use what v0.1 used.
     cfg["severity"]["occupant_curve"] = "kahane_mais3plus"
     got = _run_grid(cfg)
-    want = pd.read_csv(HERE / "fixtures" / fixture)
+    # float_precision="round_trip" is not optional here. pandas' default CSV float
+    # parser is fast rather than correctly rounded, so reading a full-precision
+    # fixture silently shifts the last bits -- measured on the results-of-record CSV,
+    # 93 of its values changed on a plain read/write cycle and 0 changed with this
+    # flag. Comparing at rtol 1e-12 against a value the reader itself perturbed is
+    # comparing to the wrong number.
+    want = pd.read_csv(HERE / "fixtures" / fixture, float_precision="round_trip")
 
     merged = got.merge(want, on=["Q_veh_h", "T_work_h"], suffixes=("_new", "_v01"))
     assert len(merged) == 49

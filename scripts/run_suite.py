@@ -129,7 +129,9 @@ def phase_sensitivity() -> None:
         res = simulate_point(400.0, float(T), n_iter, seed0 + idx, cfg, full_trace=True)
         tr = {**res["trace"]}
         write_trace(OUT / "sensitivity", f"trace_Q400_T{str(T).replace('.', 'p')}", tr)
-        df = prcc_bootstrap(tr, DEFAULT_PRCC_INPUTS, n_boot=1000, subsample=5000)
+        # Full-sample bootstrap: resamples of size n_iter, so the reported CIs
+        # describe the uncertainty of the full-sample PRCC estimates.
+        df = prcc_bootstrap(tr, DEFAULT_PRCC_INPUTS, n_boot=1000)
         df["T_work_h"] = T
         frames.append(df)
         # Decision-scale sensitivity: every harm term is proportional to r_E, so
@@ -137,7 +139,7 @@ def phase_sensitivity() -> None:
         # the inputs that drive the deploy/omit DECISION rather than the harm scale.
         tr["G_decision"] = tr["deltaH"] / tr["r_E0"]
         gx = [c for c in DEFAULT_PRCC_INPUTS if c != "r_E_per_veh_km"]
-        dg = prcc_bootstrap(tr, gx, y_col="G_decision", n_boot=1000, subsample=5000)
+        dg = prcc_bootstrap(tr, gx, y_col="G_decision", n_boot=1000)
         dg["T_work_h"] = T
         frames_g.append(dg)
         print(f"  T={T}: top3 {list(df.head(3).parameter)} | decision-scale top3 {list(dg.head(3).parameter)}")

@@ -61,8 +61,25 @@ def sample_dist(rng: np.random.Generator, spec: Dict[str, Any], size: int, name:
 
 
 def sample_all(rng: np.random.Generator, cfg: Dict[str, Any], n: int) -> Dict[str, np.ndarray]:
-    """Draw every configured distribution, in config order (legacy stream order)."""
-    return {name: sample_dist(rng, spec, n, name) for name, spec in cfg["distributions"].items()}
+    """Draw every configured distribution in the canonical stream order.
+
+    The order is taken from CANONICAL_DIST_ORDER, not from the mapping, so a
+    caller that assembles a config without going through ``load_config`` still
+    consumes the RNG stream in the order the results of record were produced
+    under. ``validate_config`` enforces that the two agree; this makes the
+    guarantee hold even when it is bypassed.
+    """
+    dists = cfg["distributions"]
+    missing = [name for name in CANONICAL_DIST_ORDER if name not in dists]
+    if missing:
+        raise DistributionError(f"Config missing distributions: {missing}")
+    extra = [name for name in dists if name not in CANONICAL_DIST_ORDER]
+    if extra:
+        raise DistributionError(
+            f"Config carries distributions outside CANONICAL_DIST_ORDER: {extra}. "
+            "Adding one shifts every later variable's slice of the RNG stream."
+        )
+    return {name: sample_dist(rng, dists[name], n, name) for name in CANONICAL_DIST_ORDER}
 
 
 # ----------------------------------------------------------------------------

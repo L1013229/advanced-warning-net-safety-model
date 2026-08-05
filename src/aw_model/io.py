@@ -32,13 +32,18 @@ def write_run_outputs(out_dir: str | Path, cfg: Dict[str, Any], results: pd.Data
     results.to_csv(out / "grid_results.csv", index=False)
     (out / "config_used.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
 
-    import numpy, pandas, scipy  # versions for the record
+    import numpy, pandas  # versions for the record
+    try:
+        import scipy
+        scipy_version = scipy.__version__
+    except ImportError:                      # scipy is not required by the analysis
+        scipy_version = None
     meta = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "config_hash": config_hash(cfg),
         "git_hash": _git_hash(),
         "python": platform.python_version(),
-        "numpy": numpy.__version__, "pandas": pandas.__version__, "scipy": scipy.__version__,
+        "numpy": numpy.__version__, "pandas": pandas.__version__, "scipy": scipy_version,
     }
     meta.update(extra_meta or {})
     (out / "run_metadata.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
