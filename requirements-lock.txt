@@ -27,7 +27,7 @@ packaging==26.2
 pandas==3.0.1
 pluggy==1.6.0
 pyarrow==23.0.1
-Pygments==2.20.0
+Pygments==2.21.0
 pytest==9.0.3
 python-dateutil==2.9.0.post0
 PyYAML==6.0.3
