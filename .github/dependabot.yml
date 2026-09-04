@@ -1,0 +1,22 @@
+# Keeps the SHA-pinned actions and the locked Python graph moving
+# (daqt-server #5923). A lock move is a reproducibility event here: the
+# results of record are regenerated and compared by the workflow.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Pacific/Auckland
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Pacific/Auckland
