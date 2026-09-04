@@ -1,0 +1,16 @@
+{
+  "repository": "L1013229/advanced-warning-net-safety-model",
+  "recorded": "2026-09-04",
+  "programme": "L1013229/daqt-server#5923",
+  "required_check": {"context": "reproduce", "app_id": 15368, "aggregate": ".github/workflows/reproducibility.yml"},
+  "workflows": {
+    ".github/workflows/reproducibility.yml": {
+      "origin": "The single reproducibility gate: a pinned interpreter, a locked dependency graph, pinned seeds and single-threaded BLAS regenerate the published numbers and the results-of-record file byte for byte.",
+      "protects": "A change that moves a reported number, the RNG stream order, or the serialised results of record without saying so; a dependency or interpreter drift that would quietly change a decomposition.",
+      "consumer": "Pull-request admission (the job is the required check) and the daqt-server CI health monitor, which reads the default-branch verdict.",
+      "falsifier": "tests/test_ci_assurance_workflow.py pins the job's shape (hosted on a pinned image, bounded, read-only, pinned actions, main never cancelled); the workflow's own byte-identical regeneration step fails on any drift in the record.",
+      "rollback": "git revert of the workflow change; the ruleset requiring the check is removed with the provider API if the job has to be withdrawn."
+    }
+  },
+  "dependabot": {"ecosystems": ["github-actions", "pip"], "interval": "weekly"}
+}
