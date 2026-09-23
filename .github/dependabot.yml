@@ -1,6 +1,10 @@
 # Keeps the SHA-pinned actions and the locked Python graph moving
 # (daqt-server #5923). A lock move is a reproducibility event here: the
 # results of record are regenerated and compared by the workflow.
+# Each entry labels its pull requests merge:ready, which the platform's
+# dependency lane acts on (daqt-server #6477), waits for a release cooldown
+# before proposing a version, and groups only minor and patch updates, so each
+# major version arrives as its own pull request.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -13,6 +17,10 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+    labels: ["dependencies", "github_actions", "merge:ready"]
+    cooldown:
+      default-days: 7
   - package-ecosystem: pip
     directory: /
     schedule:
@@ -20,3 +28,7 @@ updates:
       day: monday
       time: "07:00"
       timezone: Pacific/Auckland
+    labels: ["dependencies", "python", "merge:ready"]
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
