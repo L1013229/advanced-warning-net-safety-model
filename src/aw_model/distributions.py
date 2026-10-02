@@ -60,7 +60,8 @@ def sample_dist(rng: np.random.Generator, spec: Dict[str, Any], size: int, name:
     raise DistributionError(f"Unsupported dist '{spec['dist']}' for '{name}'")
 
 
-def sample_all(rng: np.random.Generator, cfg: Dict[str, Any], n: int) -> Dict[str, np.ndarray]:
+def sample_all(rng: np.random.Generator, cfg: Dict[str, Any], n: int,
+               names: tuple | None = None) -> Dict[str, np.ndarray]:
     """Draw every configured distribution in the canonical stream order.
 
     The order is taken from CANONICAL_DIST_ORDER, not from the mapping, so a
@@ -79,7 +80,8 @@ def sample_all(rng: np.random.Generator, cfg: Dict[str, Any], n: int) -> Dict[st
             f"Config carries distributions outside CANONICAL_DIST_ORDER: {extra}. "
             "Adding one shifts every later variable's slice of the RNG stream."
         )
-    return {name: sample_dist(rng, dists[name], n, name) for name in CANONICAL_DIST_ORDER}
+    order = CANONICAL_DIST_ORDER if names is None else tuple(names)
+    return {name: sample_dist(rng, dists[name], n, name) for name in order}
 
 
 # ----------------------------------------------------------------------------

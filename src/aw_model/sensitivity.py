@@ -16,7 +16,7 @@ import pandas as pd
 # Inputs eligible for PRCC screening (sampled, non-degenerate by default config)
 DEFAULT_PRCC_INPUTS = [
     "d_aw_m", "v_walk_m_s", "t_handle_s", "mu_v_kmh", "sigma_v_kmh",
-    "p_R", "deltaV_kmh", "a_comfort_m_s2", "r_E_per_veh_km",
+    "p_R", "dt_react_saved_s", "a_brake_m_s2", "r_E_per_veh_km",
     "alpha_lat_m_inv", "c_work_m", "c_deploy_m", "m_striking_kg", "m_lcv_kg",
 ]
 

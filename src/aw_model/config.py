@@ -40,7 +40,13 @@ CANONICAL_DIST_ORDER = (
     "L_worker_deploy_m",
     "m_striking_kg",
     "m_lcv_kg",
+    # v1.5 (job_expectation mode): awareness mechanism. Appended AFTER the legacy
+    # names so the v0.1 stream slices are unchanged; representative_vehicle mode
+    # does not sample them (see sample_all's `names` argument).
+    "dt_react_saved_s",
+    "a_brake_m_s2",
 )
+LEGACY_DIST_ORDER = CANONICAL_DIST_ORDER[:20]
 
 
 class ConfigError(ValueError):

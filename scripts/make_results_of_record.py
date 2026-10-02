@@ -44,6 +44,8 @@ CASES: dict[str, list[str]] = {
     "highPR": ["scenarios/high_pr.yaml"],
     "baseline_fastDeploy": ["scenarios/fast_deploy.yaml"],
     "baseline_corr_plausible": ["correlation/plausible.yaml"],
+    "baseline_encounter": ["scenarios/representative_vehicle.yaml"],
+    "baseline_pointTarget": ["scenarios/point_target.yaml"],
 }
 
 COLUMNS = [

@@ -34,7 +34,10 @@ def _run_grid(cfg):
     ("v01_highPR_grid_results.csv", ["scenarios/high_pr.yaml"]),
 ])
 def test_reproduces_v01_grid(fixture, overlays):
-    cfg = load_config(CONFIG_DIR / "base.yaml", [CONFIG_DIR / o for o in overlays])
+    # v0.1 was a representative-vehicle model; v1.5 made job_expectation the default, so the
+    # gate pins the legacy construction explicitly through its overlay.
+    cfg = load_config(CONFIG_DIR / "base.yaml",
+                      [CONFIG_DIR / o for o in overlays] + [CONFIG_DIR / "scenarios/representative_vehicle.yaml"])
     # v0.1 used the legacy occupant curve (unverifiable provenance; superseded
     # by Wang 2022 in production). Reproduction must use what v0.1 used.
     cfg["severity"]["occupant_curve"] = "kahane_mais3plus"

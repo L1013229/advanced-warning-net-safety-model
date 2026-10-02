@@ -43,7 +43,8 @@ OUT = ROOT / "outputs"
 
 SUMMARY_COLS = ["Q_veh_h", "T_work_h", "mean_deltaH", "median_deltaH", "p_benefit",
                 "p_benefit_lo95", "p_benefit_hi95", "mean_H0", "median_H0",
-                "median_rel_deltaH", "achieved_response_share", "target_response_share"]
+                "median_rel_deltaH", "achieved_response_share", "target_response_share",
+                "deltaH_q05", "deltaH_q95", "p_star_q10", "p_star_median", "p_star_q90"]
 
 
 def run_grid(cfg: dict, tag: str | None = None, keep_deltaH: bool = False) -> pd.DataFrame:
@@ -240,7 +241,25 @@ def phase_severity() -> None:
             run_grid(cfg)
 
 
-PHASES = {"primary": phase_primary, "correlation": phase_correlation, "tail": phase_tail,
+def phase_target_length() -> None:
+    """Worker as a 1 m point target during the work (sensitivity to the 10 m work-period target)."""
+    print("== target length ==")
+    for scen, sname in [(None, "baseline"), ("scenarios/high_pr.yaml", "highPR")]:
+        cfg = load_config(CONFIG / "base.yaml", ([CONFIG / scen] if scen else []) + [CONFIG / "scenarios/point_target.yaml"])
+        cfg["meta"]["tag"] = f"{sname}_pointTarget"
+        run_grid(cfg)
+
+
+def phase_encounter() -> None:
+    """v1.4 representative-vehicle construction: the share of departures the sign changes at all."""
+    print("== per-encounter bound ==")
+    for scen, sname in [(None, "baseline"), ("scenarios/high_pr.yaml", "highPR")]:
+        cfg = load_config(CONFIG / "base.yaml", ([CONFIG / scen] if scen else []) + [CONFIG / "scenarios/representative_vehicle.yaml"])
+        cfg["meta"]["tag"] = f"{sname}_encounter"
+        run_grid(cfg)
+
+
+PHASES = {"primary": phase_primary, "target_length": phase_target_length, "encounter": phase_encounter, "correlation": phase_correlation, "tail": phase_tail,
           "ke": phase_ke, "sensitivity": phase_sensitivity, "convergence": phase_convergence,
           "validation": phase_validation, "severity": phase_severity}
 
