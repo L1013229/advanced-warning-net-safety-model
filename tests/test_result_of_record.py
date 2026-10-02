@@ -52,6 +52,8 @@ CASES: dict[str, list[str]] = {
     "highPR": ["scenarios/high_pr.yaml"],
     "baseline_fastDeploy": ["scenarios/fast_deploy.yaml"],
     "baseline_corr_plausible": ["correlation/plausible.yaml"],
+    "baseline_encounter": ["scenarios/representative_vehicle.yaml"],
+    "baseline_pointTarget": ["scenarios/point_target.yaml"],
 }
 
 BIT_EXACT_COLUMNS = ("p_benefit", "p_benefit_lo95", "p_benefit_hi95")

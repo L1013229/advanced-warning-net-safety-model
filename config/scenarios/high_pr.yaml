@@ -1,5 +1,6 @@
-# Overlay: optimistic driver response (stress test)
+# Overlay: all-traffic upper bound on reach. Departing drivers made aware at the rate measured
+# across ALL passing traffic, Uniform(0, 0.30); the v1.4 "standard response" prior.
 meta:
   tag: highPR
 distributions:
-  p_R: {dist: fixed, value: 0.6}
+  p_R: {dist: uniform, min: 0.0, max: 0.30}

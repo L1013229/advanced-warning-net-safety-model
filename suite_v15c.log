@@ -1,0 +1,69 @@
+== primary ==
+  [baseline] 49 points in 8.3s  p_benefit 0.0542..0.9622
+  [baseline_fastDeploy] 49 points in 10.0s  p_benefit 0.1908..0.9988
+  [highPR] 49 points in 9.8s  p_benefit 0.1961..0.9899
+  [high_PR_fastDeploy] 49 points in 8.7s  p_benefit 0.5585..0.9950
+== target length ==
+  [baseline_pointTarget] 49 points in 7.4s  p_benefit 0.0000..0.5596
+  [highPR_pointTarget] 49 points in 7.7s  p_benefit 0.0000..0.9208
+== per-encounter bound ==
+  [baseline_encounter] 49 points in 0.5s  p_benefit 0.0530..0.0680
+  [highPR_encounter] 49 points in 0.5s  p_benefit 0.1239..0.1557
+== reach prior floor ==
+  [baseline_reachFloor0p001] 49 points in 7.5s  p_benefit 0.0435..0.8030
+  [baseline_reachFloor0p01] 49 points in 7.6s  p_benefit 0.0727..1.0000
+== correlation ==
+  [baseline_corr_plausible] 49 points in 9.9s  p_benefit 0.0537..0.9621
+  [baseline_corr_stress] 49 points in 9.8s  p_benefit 0.0790..0.9399
+  [baseline_corr_behavioural] 49 points in 8.4s  p_benefit 0.0562..0.9603
+  [highPR_corr_plausible] 49 points in 8.7s  p_benefit 0.1968..0.9897
+  [highPR_corr_stress] 49 points in 9.9s  p_benefit 0.2407..0.9862
+  [highPR_corr_behavioural] 49 points in 8.4s  p_benefit 0.2019..0.9900
+== tail allocation ==
+  [baseline_alloc_low_tail] 49 points in 9.0s  p_benefit 0.0288..0.9371
+  [baseline_alloc_high_tail] 49 points in 7.9s  p_benefit 0.0803..0.9778
+  [highPR_alloc_low_tail] 49 points in 7.5s  p_benefit 0.1064..0.9878
+  [highPR_alloc_high_tail] 49 points in 7.6s  p_benefit 0.2808..0.9915
+== k_E sweep ==
+  [baseline_KE0p5] 49 points in 7.4s  p_benefit 1.0000..1.0000
+  [baseline_KE0p55] 49 points in 7.3s  p_benefit 1.0000..1.0000
+  [baseline_KE0p6] 49 points in 7.1s  p_benefit 1.0000..1.0000
+  [baseline_KE0p65] 49 points in 7.3s  p_benefit 1.0000..1.0000
+  [baseline_KE0p7] 49 points in 14.1s  p_benefit 1.0000..1.0000
+  [baseline_KE0p75] 49 points in 7.6s  p_benefit 1.0000..1.0000
+  [baseline_KE0p8] 49 points in 7.8s  p_benefit 0.9994..1.0000
+  [baseline_KE0p85] 49 points in 7.9s  p_benefit 0.9687..1.0000
+  [baseline_KE0p9] 49 points in 7.5s  p_benefit 0.5579..1.0000
+  [baseline_KE0p95] 49 points in 7.7s  p_benefit 0.1542..1.0000
+== sensitivity (PRCC + bootstrap) ==
+  T=0.05: top3 ['r_E_per_veh_km', 'p_R', 'd_aw_m'] | decision-scale top3 ['p_R', 'mu_v_kmh', 'd_aw_m']
+  T=0.25: top3 ['p_R', 'r_E_per_veh_km', 'dt_react_saved_s'] | decision-scale top3 ['p_R', 'dt_react_saved_s', 'd_aw_m']
+  T=2.0: top3 ['p_R', 'r_E_per_veh_km', 'dt_react_saved_s'] | decision-scale top3 ['p_R', 'dt_react_saved_s', 'a_brake_m_s2']
+== convergence ==
+   Q    T  p_at_20k  p_at_50k  abs_drift
+ 400 0.05   0.05535   0.05518    0.00017
+ 400 0.25   0.38715   0.38680    0.00035
+ 400 2.00   0.83830   0.83916    0.00086
+  50 0.05   0.05460   0.05618    0.00158
+1000 4.00   0.96160   0.96032    0.00128
+== validation ==
+  quantity    hand_calc        model     rel_diff
+T_deploy_s 2.000000e+02 2.000000e+02 0.000000e+00
+ lambda_w0 8.187308e-07 8.187308e-07 2.586421e-16
+ lambda_v0 4.912385e-07 4.912385e-07 2.155351e-16
+  lambda_d 2.010750e-08 2.010750e-08 4.936550e-16
+   p_w(V0) 3.318122e-01 3.318145e-01 6.837088e-06
+  p_o(dv0) 2.241625e-02 2.241667e-02 1.886976e-05
+        H0 2.826766e-07 2.826787e-07 7.305823e-06
+        H1 2.893485e-07 2.893506e-07 7.295015e-06
+    deltaH 6.671914e-09 6.671959e-09 6.837088e-06
+  worst relative difference: 1.89e-05
+== severity robustness ==
+  [baseline_sev_fatality_only] 49 points in 9.9s  p_benefit 0.0961..0.9898
+  [highPR_sev_fatality_only] 49 points in 10.2s  p_benefit 0.3323..0.9929
+  [baseline_sev_legacy_occupant] 49 points in 11.0s  p_benefit 0.0571..0.9650
+  [highPR_sev_legacy_occupant] 49 points in 9.8s  p_benefit 0.2099..0.9902
+  [baseline_sev_occupant_frontal] 49 points in 10.2s  p_benefit 0.0538..0.9619
+  [highPR_sev_occupant_frontal] 49 points in 10.0s  p_benefit 0.1951..0.9899
+
+Suite complete in 1916.8s -> /tmp/claude-0/-root-daqt-server/d4b2fddc-a9e3-46da-a918-4ff52a6f499a/scratchpad/aw/awrepo/outputs
