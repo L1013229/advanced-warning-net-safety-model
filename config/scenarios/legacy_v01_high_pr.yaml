@@ -1,0 +1,7 @@
+# Overlay for the v0.1 reproduction gate only: representative-vehicle construction with p_R fixed at 0.60.
+meta:
+  tag: legacy_v01_highPR
+model:
+  iteration: representative_vehicle
+distributions:
+  p_R: {dist: fixed, value: 0.6}

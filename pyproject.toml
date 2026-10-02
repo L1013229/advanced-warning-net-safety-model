@@ -1,7 +1,7 @@
 [project]
 name = "aw-net-risk-model"
-version = "1.2.0"
-description = "Probabilistic net-safety-benefit model for portable advanced warning signs in low-impact roadside work (PhD Paper 5)"
+version = "1.1.0"
+description = "Probabilistic net-safety-benefit model for portable advanced warning signs in low-impact roadside work"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",

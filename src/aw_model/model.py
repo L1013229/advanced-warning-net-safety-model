@@ -20,6 +20,7 @@ import numpy as np
 
 from .distributions import sample_all, apply_correlation
 from .risk_functions import p_worker, p_occupant
+from .expectation import expected_severities, compute_harm_expectation
 
 
 # ---------------------------------------------------------------------------
@@ -60,7 +61,12 @@ def sample_inputs(rng: np.random.Generator, cfg: Dict[str, Any], n: int, seed: i
     Correlation (if configured) reorders already-drawn columns and consumes no
     draws from this stream (its score matrix uses a derived, dedicated RNG).
     """
-    draws = sample_all(rng, cfg, n)
+    mode = str((cfg.get("model", {}) or {}).get("iteration", "representative_vehicle")).lower()
+    if mode == "representative_vehicle":
+        from .config import LEGACY_DIST_ORDER
+        draws = sample_all(rng, cfg, n, names=LEGACY_DIST_ORDER)   # v0.1 stream, bit-exact
+    else:
+        draws = sample_all(rng, cfg, n)
 
     # Correlation must be imposed BEFORE V0 is generated so that pairs
     # involving mu_v/sigma_v propagate into the speed actually used downstream.
@@ -256,10 +262,21 @@ def simulate_point(Q_veh_h: float, T_work_h: float, n_iter: int, seed: int,
     draws = sample_inputs(rng, cfg, n_iter, seed)
 
     exposure = compute_deployment_exposure(draws)
-    speeds = apply_sign_response(draws, cfg)
-    freq = compute_encroachment_frequencies(Q_veh_h, T_work_h, draws, exposure, cfg)
-    sev = compute_severity(draws, speeds, cfg)
-    harm = compute_harm(freq, sev)
+    mode = str((cfg.get("model", {}) or {}).get("iteration", "representative_vehicle")).lower()
+    if mode == "job_expectation":
+        # job_expectation: one job per iteration; vehicle-to-vehicle variation averaged inside
+        sev = expected_severities(draws, cfg)
+        speeds = {"achieved_response_share": sev["achieved_response_share"],
+                  "target_response_share": sev["target_response_share"]}
+        freq = compute_encroachment_frequencies(Q_veh_h, T_work_h, draws, exposure, cfg)
+        harm = compute_harm_expectation(freq, sev, draws["p_R"])
+    elif mode == "representative_vehicle":
+        speeds = apply_sign_response(draws, cfg)
+        freq = compute_encroachment_frequencies(Q_veh_h, T_work_h, draws, exposure, cfg)
+        sev = compute_severity(draws, speeds, cfg)
+        harm = compute_harm(freq, sev)
+    else:
+        raise ValueError(f"Unknown model.iteration '{mode}'")
 
     deltaH = harm["deltaH"]
     p_benefit = float(np.mean(deltaH < 0.0))
@@ -297,6 +314,11 @@ def simulate_point(Q_veh_h: float, T_work_h: float, n_iter: int, seed: int,
         "mean_H0": float(np.mean(harm["H0"])),
         "median_H0": float(np.median(harm["H0"])),
         "median_rel_deltaH": float(np.nanmedian(rel)),
+        "deltaH_q05": float(np.percentile(deltaH, 5)),
+        "deltaH_q95": float(np.percentile(deltaH, 95)),
+        "p_star_q10": float(np.percentile(harm["p_star"], 10)) if "p_star" in harm else float("nan"),
+        "p_star_median": float(np.median(harm["p_star"])) if "p_star" in harm else float("nan"),
+        "p_star_q90": float(np.percentile(harm["p_star"], 90)) if "p_star" in harm else float("nan"),
         "achieved_response_share": speeds["achieved_response_share"],
         "target_response_share": speeds["target_response_share"],
         "deltaH": deltaH,

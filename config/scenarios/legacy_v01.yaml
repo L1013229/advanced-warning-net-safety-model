@@ -1,0 +1,8 @@
+# Overlay for the v0.1 reproduction gate only: the release v1.0 representative-vehicle construction with the
+# release v1.0 response prior. Not an analysis case.
+meta:
+  tag: legacy_v01
+model:
+  iteration: representative_vehicle
+distributions:
+  p_R: {dist: uniform, min: 0.0, max: 0.30}

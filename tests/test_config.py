@@ -17,7 +17,7 @@ def test_base_loads_and_validates():
 def test_overlay_merges_only_diffs():
     cfg = load_config(CONFIG_DIR / "base.yaml", [CONFIG_DIR / "scenarios/high_pr.yaml"])
     assert cfg["meta"]["tag"] == "highPR"
-    assert cfg["distributions"]["p_R"] == {"dist": "fixed", "value": 0.6}
+    assert cfg["distributions"]["p_R"] == {"dist": "uniform", "min": 0.0, "max": 0.30}
     # Untouched keys survive from base
     assert cfg["distributions"]["d_aw_m"]["mode"] == 50
     assert cfg["monte_carlo"]["seed"] == 12345
@@ -25,7 +25,7 @@ def test_overlay_merges_only_diffs():
 
 def test_overlay_stacking_order():
     cfg = load_config(CONFIG_DIR / "base.yaml",
-                      [CONFIG_DIR / "scenarios/high_pr.yaml",
+                      [CONFIG_DIR / "scenarios/legacy_v01_high_pr.yaml",
                        CONFIG_DIR / "correlation/plausible.yaml"])
     assert cfg["distributions"]["p_R"]["value"] == 0.6
     assert cfg["correlation"]["pairs"] == [["mu_v_kmh", "r_E_per_veh_km", 0.3]]

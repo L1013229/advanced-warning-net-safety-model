@@ -91,7 +91,8 @@ def test_harm_identity_no_sign_effect():
 
 def test_tail_allocation_preserves_marginal_and_orders_effect():
     """low_tail / high_tail keep the response share ~= p_R but shift who responds."""
-    cfg = load_config(CONFIG_DIR / "base.yaml", [CONFIG_DIR / "scenarios/high_pr.yaml"])
+    # fixed p_R = 0.6 (legacy highPR overlay) so the achieved share is a sharp number to check
+    cfg = load_config(CONFIG_DIR / "base.yaml", [CONFIG_DIR / "scenarios/legacy_v01_high_pr.yaml"])
     out = {}
     for mode in ("independent", "low_tail", "high_tail"):
         cfg["model"]["response_allocation"] = mode

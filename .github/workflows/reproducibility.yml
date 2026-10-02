@@ -22,6 +22,11 @@ on:
 permissions:
   contents: read
 
+# A pull request cancels its own superseded heads; a main run is never cancelled.
+concurrency:
+  group: reproducibility-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('sha-{0}', github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   # Determinism knobs. PYTHONHASHSEED pins any dict/set ordering that could
   # leak into an iteration order; the thread caps pin the BLAS backend so a
@@ -36,11 +41,14 @@ env:
 jobs:
   reproduce:
     runs-on: ubuntu-24.04   # pinned image, not `ubuntu-latest`
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Pinned interpreter
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.14.3"
 
