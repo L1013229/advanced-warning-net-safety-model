@@ -20,10 +20,10 @@ model:
   # Which drivers respond, holding the marginal p_R fixed:
   # independent (legacy) | low_tail (slow drivers respond) | high_tail (fast drivers respond)
   response_allocation: independent
-  # v1.5 iteration semantics. job_expectation: one job per iteration, vehicle-to-vehicle
+  # Iteration semantics. job_expectation: one job per iteration, vehicle-to-vehicle
   # variation (speed, striking mass, response) averaged inside the iteration, so
   # P(deltaH<0) is a probability over parameter uncertainty. representative_vehicle:
-  # the v1.4 construction (one vehicle per iteration), kept for the per-encounter bound.
+  # the release v1.0 construction (one vehicle per iteration), kept for the per-encounter bound.
   iteration: job_expectation
 
 severity:
@@ -55,7 +55,7 @@ distributions:
   sigma_v_kmh:       {dist: uniform, min: 6.0, max: 12.0}
   v_cap_kmh:         {dist: fixed, value: 80.0}
   # Sign effect
-  # Reach: share of DEPARTING drivers the sign made aware (v1.5). Known only to order of
+  # Reach: share of DEPARTING drivers the sign made aware. Known only to order of
   # magnitude: bounded above by the share of ALL passing drivers that react to a passive
   # sign (about 0.30 in field studies) and probably far lower, because drivers who leave a
   # straight road are disproportionately inattentive, fatigued, impaired or speeding.
@@ -79,7 +79,7 @@ distributions:
   # Vehicle masses for delta-V mapping
   m_striking_kg:     {dist: uniform, min: 1200.0, max: 2000.0}
   m_lcv_kg:          {dist: uniform, min: 1800.0, max: 3000.0}
-  # Awareness mechanism (v1.5, job_expectation mode). Reaction time saved by an aware
+  # Awareness mechanism (job_expectation mode). Reaction time saved by an aware
   # driver: mean PRT 1.1 s unexpected vs 0.65 s expected, 95th pct 2.0 s unexpected
   # (Fambro et al. 1997, NCHRP 400); end-of-queue studies use 0.5 and 1.0 s as warning
   # effect sizes. Braking deceleration of a driver who reacts: 0.36-0.46 g design

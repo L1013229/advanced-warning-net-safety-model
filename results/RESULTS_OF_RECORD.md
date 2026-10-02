@@ -10,11 +10,11 @@ prove the rebuild did not change the legacy answer — a useful check, but it
 says nothing about whether today's code still produces the numbers that were
 written down from today's code.
 
-## Iteration semantics (v1.5)
+## Iteration semantics
 
 The default `model.iteration: job_expectation` makes each iteration one job under one draw of the
 uncertain inputs, with speed, striking mass and departing-driver awareness averaged inside it
-(`src/aw_model/expectation.py`). `scenarios/representative_vehicle.yaml` restores the v1.4
+(`src/aw_model/expectation.py`). `scenarios/representative_vehicle.yaml` restores the release v1.0
 construction, which the v0.1 gate (`tests/test_reproduction.py`) and the `baseline_encounter` case pin.
 
 ## What is pinned
@@ -25,7 +25,7 @@ construction, which the v0.1 gate (`tests/test_reproduction.py`) and the `baseli
 | `highPR` | `scenarios/high_pr.yaml` | elementwise NumPy only |
 | `baseline_fastDeploy` | `scenarios/fast_deploy.yaml` | elementwise NumPy only |
 | `baseline_corr_plausible` | `correlation/plausible.yaml` | Iman-Conover → LAPACK |
-| `baseline_encounter` | `scenarios/representative_vehicle.yaml` | elementwise NumPy only (v1.4 construction, per-encounter bound) |
+| `baseline_encounter` | `scenarios/representative_vehicle.yaml` | elementwise NumPy only (release v1.0 construction, per-encounter bound) |
 | `baseline_pointTarget` | `scenarios/point_target.yaml` | elementwise NumPy only (worker as a 1 m target in both periods) |
 
 Columns: `mean_deltaH`, `median_deltaH`, `median_rel_deltaH`, `p_benefit`,

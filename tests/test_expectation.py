@@ -1,4 +1,4 @@
-"""Job-expectation mode (v1.5): identities and agreement with brute-force inner sampling."""
+"""Job-expectation mode: identities and agreement with brute-force inner sampling."""
 import copy
 import sys
 from pathlib import Path

@@ -1,4 +1,4 @@
-# Overlay: v1.4 representative-vehicle iteration (one speed, one mass, one Bernoulli response per
+# Overlay: release v1.0 representative-vehicle iteration (one speed, one mass, one Bernoulli response per
 # iteration). Its P(deltaH<0) is the share of departures the sign changes at all, bounded by E[p_R].
 meta:
   tag: baseline_encounter

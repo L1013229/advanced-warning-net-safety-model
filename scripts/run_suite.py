@@ -81,7 +81,7 @@ def phase_correlation() -> None:
     print("== correlation ==")
     for scen, sname in [(None, "baseline"), ("scenarios/high_pr.yaml", "highPR")]:
         for corr in ("plausible", "stress", "behavioural"):
-            # v1.5: p_R is sampled in every case, so every structure applies to both.
+            # p_R is sampled in every case, so every structure applies to both.
             overlays = ([CONFIG / scen] if scen else []) + [CONFIG / f"correlation/{corr}.yaml"]
             cfg = load_config(CONFIG / "base.yaml", overlays)
             cfg["meta"]["tag"] = f"{sname}_corr_{corr}"
@@ -247,7 +247,7 @@ def phase_target_length() -> None:
 
 
 def phase_encounter() -> None:
-    """v1.4 representative-vehicle construction: the share of departures the sign changes at all."""
+    """Release v1.0 representative-vehicle construction: the share of departures the sign changes at all."""
     print("== per-encounter bound ==")
     for scen, sname in [(None, "baseline"), ("scenarios/high_pr.yaml", "highPR")]:
         cfg = load_config(CONFIG / "base.yaml", ([CONFIG / scen] if scen else []) + [CONFIG / "scenarios/representative_vehicle.yaml"])

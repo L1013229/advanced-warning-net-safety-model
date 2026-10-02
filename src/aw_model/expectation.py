@@ -1,4 +1,4 @@
-"""Job-expectation iteration mode (v1.5).
+"""Job-expectation iteration mode.
 
 Each Monte Carlo iteration is one job under one draw of the uncertain
 parameters. Quantities that vary from vehicle to vehicle are averaged inside
@@ -85,7 +85,7 @@ def expected_severities(draws: Dict[str, np.ndarray], cfg: Dict[str, Any]) -> Di
             raise ValueError(f"Unknown response_allocation '{alloc}'")
         p_k = np.minimum(p_R * w, 1.0)
 
-    # Awareness mechanism (v1.5): a driver the sign made aware reacts dt sooner to the
+    # Awareness mechanism: a driver the sign made aware reacts dt sooner to the
     # departure and brakes at a_b over the distance that time buys, V dt. Impact speed
     # Vr^2 = V^2 - 2 a_b V dt (in m/s), floored at zero. Non-responders strike at V.
     dt = np.maximum(draws["dt_react_saved_s"], 0.0)[:, None]

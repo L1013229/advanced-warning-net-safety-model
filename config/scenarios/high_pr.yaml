@@ -1,5 +1,5 @@
 # Overlay: all-traffic upper bound on reach. Departing drivers made aware at the rate measured
-# across ALL passing traffic, Uniform(0, 0.30); the v1.4 "standard response" prior.
+# across ALL passing traffic, Uniform(0, 0.30); the release v1.0 "standard response" prior.
 meta:
   tag: highPR
 distributions:

@@ -264,7 +264,7 @@ def simulate_point(Q_veh_h: float, T_work_h: float, n_iter: int, seed: int,
     exposure = compute_deployment_exposure(draws)
     mode = str((cfg.get("model", {}) or {}).get("iteration", "representative_vehicle")).lower()
     if mode == "job_expectation":
-        # v1.5: one job per iteration; vehicle-to-vehicle variation averaged inside
+        # job_expectation: one job per iteration; vehicle-to-vehicle variation averaged inside
         sev = expected_severities(draws, cfg)
         speeds = {"achieved_response_share": sev["achieved_response_share"],
                   "target_response_share": sev["target_response_share"]}

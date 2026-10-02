@@ -22,9 +22,7 @@ on:
 permissions:
   contents: read
 
-# A pull request cancels its own superseded heads; a main run is never
-# cancelled, because it is the exact-main evidence the CI health monitor
-# reads (daqt-server #5923).
+# A pull request cancels its own superseded heads; a main run is never cancelled.
 concurrency:
   group: reproducibility-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('sha-{0}', github.sha) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
