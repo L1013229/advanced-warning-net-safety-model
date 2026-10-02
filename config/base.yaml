@@ -55,7 +55,12 @@ distributions:
   sigma_v_kmh:       {dist: uniform, min: 6.0, max: 12.0}
   v_cap_kmh:         {dist: fixed, value: 80.0}
   # Sign effect
-  p_R:               {dist: uniform, min: 0.0, max: 0.30}
+  # Reach: share of DEPARTING drivers the sign made aware (v1.5). Known only to order of
+  # magnitude: bounded above by the share of ALL passing drivers that react to a passive
+  # sign (about 0.30 in field studies) and probably far lower, because drivers who leave a
+  # straight road are disproportionately inattentive, fatigued, impaired or speeding.
+  # Log-uniform over two decades weights each decade equally, as for r_E.
+  p_R:               {dist: loguniform, min: 0.003, max: 0.30}
   deltaV_kmh:        {dist: uniform, min: 0.0, max: 15.0}
   a_comfort_m_s2:    {dist: uniform, min: 0.8, max: 2.5}
   # Road departure model

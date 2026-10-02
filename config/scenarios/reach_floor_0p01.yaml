@@ -1,0 +1,4 @@
+meta:
+  tag: baseline_reachFloor0p01
+distributions:
+  p_R: {dist: loguniform, min: 0.01, max: 0.30}

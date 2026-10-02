@@ -81,12 +81,8 @@ def phase_correlation() -> None:
     print("== correlation ==")
     for scen, sname in [(None, "baseline"), ("scenarios/high_pr.yaml", "highPR")]:
         for corr in ("plausible", "stress", "behavioural"):
-            if sname == "highPR" and corr == "behavioural":
-                continue  # p_R is fixed under highPR; a p_R correlation is undefined
-            corr_file = corr
-            if sname == "highPR" and corr == "stress":
-                corr_file = "stress_fixed_pr"  # stress minus the p_R pair (undefined for fixed p_R)
-            overlays = ([CONFIG / scen] if scen else []) + [CONFIG / f"correlation/{corr_file}.yaml"]
+            # v1.5: p_R is sampled in every case, so every structure applies to both.
+            overlays = ([CONFIG / scen] if scen else []) + [CONFIG / f"correlation/{corr}.yaml"]
             cfg = load_config(CONFIG / "base.yaml", overlays)
             cfg["meta"]["tag"] = f"{sname}_corr_{corr}"
             run_grid(cfg)
@@ -259,7 +255,15 @@ def phase_encounter() -> None:
         run_grid(cfg)
 
 
-PHASES = {"primary": phase_primary, "target_length": phase_target_length, "encounter": phase_encounter, "correlation": phase_correlation, "tail": phase_tail,
+def phase_reach_prior() -> None:
+    """Sensitivity to the floor of the log-uniform reach prior."""
+    print("== reach prior floor ==")
+    for ov in ("scenarios/reach_floor_0p001.yaml", "scenarios/reach_floor_0p01.yaml"):
+        run_grid(load_config(CONFIG / "base.yaml", [CONFIG / ov]))
+
+
+PHASES = {"primary": phase_primary, "target_length": phase_target_length, "encounter": phase_encounter,
+          "reach_prior": phase_reach_prior, "correlation": phase_correlation, "tail": phase_tail,
           "ke": phase_ke, "sensitivity": phase_sensitivity, "convergence": phase_convergence,
           "validation": phase_validation, "severity": phase_severity}
 

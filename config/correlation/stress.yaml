@@ -8,4 +8,4 @@ correlation:
     - [mu_v_kmh, r_E_per_veh_km, 0.5]
     - [mu_v_kmh, sigma_v_kmh, 0.3]
     - [v_walk_m_s, t_handle_s, -0.3]
-    - [p_R, deltaV_kmh, 0.4]
+    - [p_R, dt_react_saved_s, 0.4]   # sites where more departing drivers are made aware also gain more reaction time
